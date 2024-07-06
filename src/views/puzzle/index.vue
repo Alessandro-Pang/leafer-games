@@ -69,7 +69,7 @@ nextTick(() => initGame())
   <a-row class="main">
     <a-col :lg="8" :md="24">
       <h3>缩略图</h3>
-      <div style="height: 200px; width: 200px">
+      <div style="height: 200px; width: 200px; display: inline-block">
         <img :src="img" v-if="img" style="height: 200px" alt="缩略图">
       </div>
     </a-col>
