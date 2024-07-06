@@ -3,20 +3,22 @@ import {nextTick, ref} from "vue";
 import MarblesGame from "./index.ts";
 import {
   Spin as ASpin,
-  Select as ASelect,
-  SelectOption as ASelectOption
+  Button as AButton,
 } from "ant-design-vue";
-import {UndoOutlined} from '@ant-design/icons-vue'
 
 let marblesGame: MarblesGame | null = null
 
 const loading = ref(false);
 
 function resetGame() {
-  marblesGame = new MarblesGame('game-wrapper', { step: 1, height: 420})
+  marblesGame = new MarblesGame('game-wrapper', { step: 2, height: 420})
 }
 
 nextTick(() => resetGame())
+
+function restartGame() {
+  marblesGame?.restart()
+}
 </script>
 
 <template>
@@ -27,7 +29,7 @@ nextTick(() => resetGame())
     <div id="game-wrapper" style="width: 100%; height: 100%"></div>
   </div>
   <div style="text-align: center; margin: 20px 0">
-
+    <a-button type="primary" @click="restartGame">重新开始</a-button>
   </div>
 </template>
 
