@@ -96,4 +96,10 @@ const routesList = routes.filter(item => !item.meta.hidden)
     left: 0;
   }
 }
+
+@media (max-width: 639px) {
+ .card-item--box {
+    width: 100%;
+  }
+}
 </style>

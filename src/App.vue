@@ -20,7 +20,6 @@ const name = computed(() => route.meta.title)
 <style scoped>
 header {
   height: 60px;
-  font-size: 22px;
   font-weight: 600;
   text-align: center;
   background: linear-gradient(to bottom, #65C7F7, #0052D4);
