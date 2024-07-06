@@ -1,5 +1,4 @@
 import {App, Box} from "leafer-ui";
-import {gameConfig} from "../views/puzzle/index.ts";
 
 export function createGraph(view: HTMLElement) {
 	const app = new App({
@@ -23,22 +22,22 @@ export type GameOptions = {
 	x: number;
 	y: number;
 	borderWidth: number;
+	[key: string]: any;
 }
 
-export default class LeaferGame {
+export default abstract class LeaferGame {
 	app: App | null = null;
 	wrapper: Box | null = null;
-	private view: string;
-	private boxSize: number;
+	readonly view: string;
+	readonly boxSize: number;
 	private gameConfig: GameOptions | null = null;
 
-	constructor(view: string, gameConfig: Partial<GameOptions> = {}) {
+	protected constructor(view: string, gameConfig: Partial<GameOptions> = {}) {
 		this.view = view;
 		this.boxSize = window.innerWidth > 500 ? 500 : window.innerWidth;
 		this.init();
 		this.initConfig(gameConfig)
 		this.initGameWrapper()
-		this.runGame()
 	}
 
 	private init() {
@@ -60,6 +59,7 @@ export default class LeaferGame {
 		const defaultX = (width / 2) - this.boxSize / 2
 		const defaultY = (height / 2) - this.boxSize / 2
 		this.gameConfig = {
+			...gameConfig,
 			width: gameConfig.width || defaultSize,
 			height: gameConfig.height || defaultSize,
 			x: gameConfig.x || defaultX,
@@ -99,16 +99,12 @@ export default class LeaferGame {
 		this.app?.tree.add(this.wrapper)
 	}
 
-	getView() {
-		return this.view;
-	}
-
-	getBoxSize() {
-		return this.boxSize
-	}
-
-	getGameConfig() {
+	get config() {
 		return {...this.gameConfig}
+	}
+
+	set config(gameConfig: Partial<GameOptions>) {
+		this.initConfig(gameConfig)
 	}
 
 	getComputedStyle(prop: string | string[]) {
@@ -127,11 +123,7 @@ export default class LeaferGame {
 		}
 	}
 
-	// 主运行函数 - 外部实现
-	runGame(){}
-
-	// 提供外部钩子 - 重置钩子函数
-	restartHook(){}
+	abstract runGame(): void
 
 	restart() {
 		// 销毁画布
@@ -142,6 +134,5 @@ export default class LeaferGame {
 		this.init()
 		this.initGameWrapper()
 		this.runGame()
-		this.restartHook()
 	}
 }

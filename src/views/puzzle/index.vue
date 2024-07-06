@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import {createGraph} from "../../utils/app.ts";
 import {nextTick, ref} from "vue";
-import {init, shuffleImages} from "./index.ts";
-import {App, Box} from "leafer-ui";
+import PuzzleGame from "./index.ts";
 import {
   Button as AButton,
   message,
@@ -14,57 +12,54 @@ import {
 } from "ant-design-vue";
 import {UndoOutlined} from '@ant-design/icons-vue'
 
-let wrapper: Box | null = null
-let app: App | null = null
-
 const count = ref(4);
 const img = ref('')
 const loading = ref(false);
 
-const boxSize = window.innerWidth > 600 ? 600 : window.innerWidth;
+let puzzleGame: PuzzleGame | null = null;
+
+function fetchImage(boxSize: number): Promise<string> {
+  loading.value = true
+  return new Promise((resolve) => {
+    fetch(`https://picsum.photos/${boxSize}/${boxSize}`)
+        .then(res => res.blob())
+        .then((data) => {
+          img.value = window.URL.createObjectURL(new Blob([data]));
+          resolve(img.value)
+        })
+        .catch((err) => {
+          message.error(`图片加载失败，请刷新后重试`)
+          console.error(err)
+        })
+        .finally(() => {
+          loading.value = false
+        })
+  })
+}
 
 function initGame() {
-  if (app === null) return
-  const borderWidth = 20;
-  const option = {
-    count: count.value,
-    width: boxSize - borderWidth,
-    height: boxSize - borderWidth,
-    borderWidth
-  }
-  loading.value = true
-  fetch(`https://picsum.photos/${option.width}/${option.height}`)
-      .then(res => res.blob())
-      .then((data) => {
-        loading.value = false
-        img.value = window.URL.createObjectURL(new Blob([data]));
-        const context = init(app!, {...option, url: img.value});
-        wrapper = context.wrapper;
-      })
-      .catch((err) => {
-        message.error(`图片加载失败，请刷新后重试`)
-        console.error(err)
-      })
-      .finally(() => {
-        loading.value = false
-      })
+  puzzleGame = new PuzzleGame('game-wrapper', {count: count.value, url: ''});
+  // 通过内部实现获取 boxSize
+  fetchImage(puzzleGame.boxSize).then((url) => {
+    puzzleGame?.resetGame({count: count.value, url})
+  })
 }
 
+function changeDifficulty() {
+  puzzleGame?.resetGame({count: count.value, url: img.value})
+}
 
 function resetGame() {
-  // 销毁画布
-  app?.clear()
-  // 如果不重新创建元素，会导致重置后报错
-  const gameBox = document.createElement('div');
-  gameBox.id = 'game'
-  document.getElementById('game-wrapper')!.appendChild(gameBox)
-  // 初始化游戏
-  app = createGraph(gameBox)
-  app.set({height: boxSize, width: boxSize})
-  initGame()
+  fetchImage(puzzleGame!.boxSize).then(() => {
+    puzzleGame?.resetGame({count: count.value, url: img.value});
+  })
 }
 
-nextTick(() => resetGame())
+function shuffleImages() {
+  puzzleGame?.shuffleImages()
+}
+
+nextTick(() => initGame())
 </script>
 
 <template>
@@ -76,13 +71,13 @@ nextTick(() => resetGame())
       <h3>缩略图</h3>
       <img :src="img" style="height: 200px" alt="缩略图">
     </a-col>
-    <a-col :lg="16" :md="24" style="margin-top: 20px">
+    <a-col :lg="16" :md="24" style="margin-top: 20px; height: 100%">
       <div id="game-wrapper" style="width: 100%; height: 100%"></div>
     </a-col>
   </a-row>
   <div style="text-align: center; margin: 20px 0">
     对局难度：
-    <a-select v-model:value="count" style="width: 160px; margin-bottom: 10px" @change="resetGame">
+    <a-select v-model:value="count" style="width: 160px; margin-bottom: 10px" @change="changeDifficulty">
       <a-select-option v-for="idx of 6" :value="idx + 3">{{ `${idx + 3} x ${idx + 3}` }}</a-select-option>
     </a-select>
     <br>
@@ -90,7 +85,7 @@ nextTick(() => resetGame())
       <UndoOutlined/>
       重置拼图
     </a-button>
-    <a-button type="primary" @click="() => shuffleImages(wrapper!)">
+    <a-button type="primary" @click="shuffleImages">
       <UndoOutlined/>
       打乱拼图
     </a-button>
@@ -104,6 +99,7 @@ nextTick(() => resetGame())
   align-items: center;
   justify-content: center;
   width: 100%;
+  height: 600px;
 }
 
 .loading {
@@ -120,8 +116,4 @@ nextTick(() => resetGame())
   justify-content: center;
 }
 
-#game {
-  max-width: 600px;
-  width: 100%
-}
 </style>
