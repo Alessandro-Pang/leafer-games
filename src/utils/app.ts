@@ -1,6 +1,6 @@
 import {App} from "leafer-ui";
 
-export function createGraph(view: string) {
+export function createGraph(view: HTMLElement) {
 	const app = new App({
 		view,
 		fill: 'transparent',

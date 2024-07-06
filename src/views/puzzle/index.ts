@@ -2,7 +2,7 @@ import {type App, DropEvent, Rect as LeaferRect, DragEvent, Box} from "leafer-ui
 import type {IUI} from '@leafer-ui/interface'
 import {message} from 'ant-design-vue';
 
-const images: IUI[] = [];
+let images: IUI[] = [];
 
 type WrapperConfig = {
 	width: number;
@@ -16,28 +16,27 @@ export let gameConfig: WrapperConfig = {} as WrapperConfig
 
 /**
  * 获取容器配置
- * @param app
  * @param option
  */
-function initGameConfig(app: App, option: GameOption) {
+function initGameConfig(option: GameOption) {
 	const width = option.width || 500;
 	const height = option.height || 500;
-	const x = app.width! / 2 - width / 2;
-	const y = app.height! / 2 - height / 2;
 	gameConfig = {
 		width,
 		height,
-		x,
-		y,
+		x: 0,
+		y: 0,
 		borderWidth: option.borderWidth || 20,
 		url: option.url || `https://picsum.photos/${width}/${height}`
 	}
+	// 重置图片队列
+	images.length = 0
+	images = []
 	return gameConfig
 }
 
 /**
  * 创建游戏容器
- * @param app
  */
 function createGameWrapper(): Box {
 	const {width, height, x, y, borderWidth} = gameConfig
@@ -54,7 +53,6 @@ function createGameWrapper(): Box {
 
 /**
  * 创建图片节点
- * @param app
  * @param idx
  * @param count
  */
@@ -108,7 +106,8 @@ function bindMoveImageEvent(image: LeaferRect) {
 
 	image.on(DropEvent.DROP, (evt) => {
 		const node = evt.target
-		const {x, y, dragNode} = evt.data
+		const {x, y, dragNode} = evt.data || {}
+
 		if (!node || !dragNode) return
 		// 校验是否斜角移动
 		if (node.x !== dragNode.x && node.y !== dragNode.y) return
@@ -133,6 +132,10 @@ function bindMoveImageEvent(image: LeaferRect) {
 		// 检查是否成功
 		if (checkSort()) {
 			message.success('恭喜你，完成拼图')
+			images.forEach((item) => {
+				item.draggable = false
+				item.off()
+			})
 		}
 	})
 
@@ -155,8 +158,7 @@ export function shuffleImages(wrapper: Box) {
 		node.set(imagePos[idx])
 		node.data!.current = idx;
 	})
-	images.length = 0;
-	images.push(...wrapper.children)
+	images = [...wrapper.children]
 }
 
 
@@ -174,7 +176,7 @@ type GameOption = {
  * @param option
  */
 export function init(app: App, option: GameOption) {
-	initGameConfig(app, option)
+	initGameConfig(option)
 	const wrapper = createGameWrapper();
 	app.tree.add(wrapper)
 	for (let i = 0; i < Math.pow(option.count, 2); i++) {

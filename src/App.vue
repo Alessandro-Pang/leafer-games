@@ -10,7 +10,9 @@ const name = computed(() => route.meta.title)
   <header>
     Leafer 小游戏中心 - {{ name }}
   </header>
-  <router-view/>
+  <div class="view-box">
+    <router-view/>
+  </div>
 </template>
 
 <style scoped>
@@ -21,5 +23,9 @@ header {
   text-align: center;
   background: aquamarine;
   line-height: 60px;
+}
+.view-box {
+  height: calc(100% - 60px);
+  overflow-y: auto;
 }
 </style>
