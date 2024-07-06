@@ -40,7 +40,7 @@ function fetchImage(boxSize: number): Promise<string> {
 function initGame() {
   puzzleGame = new PuzzleGame('game-wrapper', {count: count.value, url: ''});
   // 通过内部实现获取 boxSize
-  fetchImage(puzzleGame.boxSize).then((url) => {
+  fetchImage(puzzleGame.config.width!).then((url) => {
     puzzleGame?.resetGame({count: count.value, url})
   })
 }
@@ -50,7 +50,7 @@ function changeDifficulty() {
 }
 
 function resetGame() {
-  fetchImage(puzzleGame!.boxSize).then(() => {
+  fetchImage(puzzleGame?.config.width!).then(() => {
     puzzleGame?.resetGame({count: count.value, url: img.value});
   })
 }
@@ -69,9 +69,11 @@ nextTick(() => initGame())
   <a-row class="main">
     <a-col :lg="8" :md="24">
       <h3>缩略图</h3>
-      <img :src="img" style="height: 200px" alt="缩略图">
+      <div style="height: 200px; width: 200px">
+        <img :src="img" v-if="img" style="height: 200px" alt="缩略图">
+      </div>
     </a-col>
-    <a-col :lg="16" :md="24" style="margin-top: 20px; height: 100%">
+    <a-col :lg="16" :md="24" style="margin-top: 20px; width: 100%">
       <div id="game-wrapper" style="width: 100%; height: 100%"></div>
     </a-col>
   </a-row>
@@ -99,7 +101,6 @@ nextTick(() => initGame())
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 600px;
 }
 
 .loading {

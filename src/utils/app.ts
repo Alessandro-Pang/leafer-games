@@ -27,7 +27,7 @@ export default abstract class LeaferGame {
 	private init() {
 		const gameBox = document.createElement('div');
 		gameBox.style.width = `100%`;
-		gameBox.style.height = `100%`;
+		gameBox.style.height = `${this.boxSize}px`;
 		// 如果不重新创建元素，会导致重置后报错
 		document.getElementById(this.view)!.appendChild(gameBox)
 		// 初始化游戏 app
@@ -36,7 +36,7 @@ export default abstract class LeaferGame {
 
 	private initConfig(gameConfig: Partial<GameOptions>) {
 		const borderWidth = gameConfig.borderWidth || 10;
-		const defaultSize = this.boxSize - borderWidth;
+		const defaultSize = this.boxSize;
 		const style = this.getComputedStyle(['width', 'height']);
 		if (!Array.isArray(style)) return
 		const [width, height] = style
@@ -72,8 +72,8 @@ export default abstract class LeaferGame {
 		}
 		const {width, height, x, y, borderWidth} = this.gameConfig
 		this.wrapper = new Box({
-			width: width + borderWidth * 2,
-			height: height + borderWidth * 2,
+			width: width,
+			height: height,
 			x,
 			y,
 			stroke: '#3aafff',

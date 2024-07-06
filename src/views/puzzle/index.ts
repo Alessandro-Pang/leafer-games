@@ -13,7 +13,7 @@ export default class PuzzleGame extends LeaferGame {
 
 	constructor(view: string, gameConfig: PuzzleGameOption) {
 		super(view, gameConfig);
-		if(!gameConfig.url) return
+		if (!gameConfig.url) return
 		this.runGame()
 	}
 
@@ -25,7 +25,6 @@ export default class PuzzleGame extends LeaferGame {
 			this.wrapper.add(image);
 		}
 		this.shuffleImages()
-		console.log(this.config.count)
 	}
 
 	/**
@@ -34,15 +33,16 @@ export default class PuzzleGame extends LeaferGame {
 	 * @param count
 	 */
 	createImage(idx: number, count: number) {
-		const width = this.config.width! / count;
-		const height = this.config.height! / count;
+		const borderWidth = this.config.borderWidth || 0;
+		const width = (this.config.width! - borderWidth * 2) / count;
+		const height = (this.config.height! - borderWidth * 2) / count;
 		const x = (idx % count) * width;
 		const y = Math.floor(idx / count) * height;
 		return new LeaferRect({
 			width,
 			height,
-			x: x + this.config.borderWidth!,
-			y: y + this.config.borderWidth!,
+			x: x + borderWidth,
+			y: y + borderWidth,
 			fill: {
 				type: 'image',
 				url: this.config.url,
@@ -62,7 +62,6 @@ export default class PuzzleGame extends LeaferGame {
 	 */
 	shuffleImages() {
 		if (!this.wrapper) return;
-		console.log(this.images)
 		const imagePos = this.images.map(item => ({x: item.x, y: item.y}))
 		this.wrapper.children.sort(() => Math.random() > Math.random() ? -1 : 1)
 		this.wrapper.children.forEach((node: IUI, idx) => {
