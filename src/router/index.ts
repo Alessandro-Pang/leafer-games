@@ -4,7 +4,7 @@ import Home from '../views/home/index.vue'
 import Puzzle from '../views/puzzle/index.vue'
 
 export const routes = [
-	{path: '/', component: Home, meta: {title: '首页'}},
+	{path: '/', component: Home, meta: {title: '首页', hidden: true}},
 	{path: '/puzzle', component: Puzzle, meta: {title: '拼图游戏'}},
 ]
 

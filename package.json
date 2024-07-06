@@ -3,6 +3,8 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "License": "MIT",
+  "description": "leafer-games",
   "scripts": {
     "dev": "vite --host",
     "build": "vue-tsc -b && vite build",
