@@ -1,5 +1,48 @@
-# Vue 3 + TypeScript + Vite
+# Leafer Games
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+Leafer 小游戏中心，使用 Leafer 开发的小游戏库。
 
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
+该仓库是为了演示如何使用 Leafer UI 开发小游戏，并提供了一些游戏案例。
+
+游戏案例相对比较简单，可以作为学习参考资料使用。
+
+## 在线预览
+
+在线游戏地址：[http://alexpang.cn/leafer-games/](alexpang.cn/leafer-games/)
+
+## 游戏列表
+
+| 是否完成 | 游戏名称 | 完成时间       |
+|------|------|------------|
+| ✅    | 拼图游戏 | 2024-07-07 |
+| ✅    | 弹球游戏 | 2024-07-07 |
+| ❌    | 贪吃蛇  |            |
+| ❌    | 五子棋  |            |
+| ❌    | 飞机大战 |            |
+
+## 安装
+
+```sh
+pnpm install
+```
+
+### 开发环境
+
+```sh
+npm run dev
+```
+
+### 打包
+
+```sh
+npm run build
+```
+
+## License
+
+[MIT](http://opensource.org/licenses/MIT)
+
+---
+
+欢迎在 [GitHub Issues](https://github.com/Alessandro-Pang/leafer-games/issues) 上讨论并提出问题或提交 Pull Request！
+
