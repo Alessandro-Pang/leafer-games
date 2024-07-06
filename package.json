@@ -1,0 +1,26 @@
+{
+  "name": "leafer-games",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@ant-design/icons-vue": "^7.0.1",
+    "ant-design-vue": "4.x",
+    "leafer-ui": "^1.0.0",
+    "normalize.css": "^8.0.1",
+    "vue": "^3.4.29",
+    "vue-router": "4"
+  },
+  "devDependencies": {
+    "@leafer-ui/interface": "^1.0.0",
+    "@vitejs/plugin-vue": "^5.0.5",
+    "typescript": "^5.2.2",
+    "vite": "^5.3.1",
+    "vue-tsc": "^2.0.21"
+  }
+}
