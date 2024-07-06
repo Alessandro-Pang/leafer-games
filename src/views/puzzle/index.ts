@@ -94,6 +94,7 @@ function checkSort() {
 function bindMoveImageEvent(image: LeaferRect) {
 	let dragNode: LeaferRect | null = null;
 	let [x, y] = [0, 0];
+	image.off();
 	image.on(DragEvent.START, (evt) => {
 		const node = evt.target;
 		if (!node) return
@@ -154,9 +155,10 @@ export function shuffleImages(wrapper: Box) {
 	if (!wrapper) return;
 	const imagePos = images.map(item => ({x: item.x, y: item.y}))
 	wrapper.children.sort(() => Math.random() > Math.random() ? -1 : 1)
-	wrapper.children.forEach((node, idx) => {
+	wrapper.children.forEach((node: IUI, idx) => {
 		node.set(imagePos[idx])
 		node.data!.current = idx;
+		bindMoveImageEvent(node as LeaferRect)
 	})
 	images = [...wrapper.children]
 }
@@ -183,7 +185,6 @@ export function init(app: App, option: GameOption) {
 		const image = createImage(i, option.count);
 		images.push(image)
 		wrapper.add(image);
-		bindMoveImageEvent(image)
 	}
 	shuffleImages(wrapper)
 	return {wrapper, app}
