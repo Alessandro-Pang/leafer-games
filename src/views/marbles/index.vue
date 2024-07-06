@@ -2,11 +2,7 @@
 import {nextTick, ref} from "vue";
 import MarblesGame from "./index.ts";
 import {
-  Button as AButton,
-  message,
   Spin as ASpin,
-  Col as ACol,
-  Row as ARow,
   Select as ASelect,
   SelectOption as ASelectOption
 } from "ant-design-vue";
@@ -17,7 +13,7 @@ let marblesGame: MarblesGame | null = null
 const loading = ref(false);
 
 function resetGame() {
-  marblesGame = new MarblesGame('game-wrapper')
+  marblesGame = new MarblesGame('game-wrapper', { step: 1, height: 420})
 }
 
 nextTick(() => resetGame())
