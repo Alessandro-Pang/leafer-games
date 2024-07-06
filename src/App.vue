@@ -8,7 +8,9 @@ const name = computed(() => route.meta.title)
 
 <template>
   <header>
-    Leafer 小游戏中心 - {{ name }}
+    <router-link to="/">
+      <h3 style="display: inline-block">Leafer 小游戏中心 - {{ name }}</h3>
+    </router-link>
   </header>
   <div class="view-box">
     <router-view/>
@@ -21,9 +23,14 @@ header {
   font-size: 22px;
   font-weight: 600;
   text-align: center;
-  background: aquamarine;
+  background: linear-gradient(to bottom, #65C7F7, #0052D4);
   line-height: 60px;
 }
+
+header h3 {
+  color: #fff;
+}
+
 .view-box {
   height: calc(100% - 60px);
   overflow-y: auto;
