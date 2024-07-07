@@ -1,7 +1,7 @@
 import {DropEvent, Rect as LeaferRect, DragEvent} from "leafer-ui";
 import type {IUI} from '@leafer-ui/interface'
 import {message} from 'ant-design-vue';
-import LeaferGame, {GameOptions} from "../../utils/app.ts";
+import LeaferGame, {GameOptions} from "../../utils/LeaferGame.ts";
 
 type PuzzleGameOption = {
 	count: number,

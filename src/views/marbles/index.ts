@@ -1,5 +1,5 @@
 import {Rect as LeaferRect, DragEvent, Ellipse as LeaferEllipse} from "leafer-ui";
-import LeaferGame, {GameOptions} from "../../utils/app.ts";
+import LeaferGame, {GameOptions} from "../../utils/LeaferGame.ts";
 import {message} from "ant-design-vue";
 
 type MarblesGameConfig = {

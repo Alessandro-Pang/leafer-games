@@ -12,6 +12,7 @@ export type GameOptions = {
 export default abstract class LeaferGame {
 	app: App | null = null;
 	wrapper: Box | null = null;
+	private gameBox: HTMLElement | null = null;
 	readonly view: string;
 	readonly boxSize: number;
 	private gameConfig: GameOptions | null = null;
@@ -32,24 +33,32 @@ export default abstract class LeaferGame {
 		document.getElementById(this.view)!.appendChild(gameBox)
 		// 初始化游戏 app
 		this.createGameApp(gameBox);
+		this.gameBox = gameBox
 	}
 
 	private initConfig(gameConfig: Partial<GameOptions>) {
 		const borderWidth = gameConfig.borderWidth || 10;
 		const defaultSize = this.boxSize;
+		// 获取容器宽高
 		const style = this.getComputedStyle(['width', 'height']);
 		if (!Array.isArray(style)) return
-		const [width, height] = style
-		const defaultX = (width / 2) - this.boxSize / 2
-		const defaultY = (height / 2) - this.boxSize / 2
+		const [wrapperWidth, wrapperHeight] = style
+		// box 的宽高
+		const width = gameConfig.width || defaultSize
+		const height = gameConfig.height || defaultSize
+		// 计算居中偏移量
+		const defaultX = (wrapperWidth / 2) - this.boxSize / 2
+		const defaultY = (wrapperHeight / 2) - height / 2
 		this.gameConfig = {
 			...gameConfig,
-			width: gameConfig.width || defaultSize,
-			height: gameConfig.height || defaultSize,
+			width,
+			height,
 			x: gameConfig.x || defaultX,
 			y: gameConfig.y || defaultY,
 			borderWidth,
 		}
+		// 修改内部容器宽高
+		this.gameBox!.style.height = `${wrapperHeight}px`
 	}
 
 	private createGameApp(view: HTMLElement) {
