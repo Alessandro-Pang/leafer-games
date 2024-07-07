@@ -174,6 +174,7 @@ export default class SnakeGame extends LeaferGame {
 		this.score = 0;
 		this.config.updateScore(0)
 		this.snake = []
+		this.to = [size, 0]
 		clearInterval(this.timer!)
 		super.restart()
 		this.start()
