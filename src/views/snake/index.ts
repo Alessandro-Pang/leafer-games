@@ -15,7 +15,7 @@ export default class SnakeGame extends LeaferGame {
 	private timer: number | null = null;
 	private star: Star | null = null;
 	private score: number = 0;
-	private to = [size, 0]
+	private to = [size, 0];
 
 	constructor(view: string, gameConfig: MarblesGameConfig) {
 		super(view, gameConfig);
@@ -58,37 +58,26 @@ export default class SnakeGame extends LeaferGame {
 		switch (event.code) {
 			case 'KeyW':
 			case 'ArrowUp':
-				if (self.to[1]) {
-					self.moveSnake()
-					break
-				}
+				if (self.to[1]) break
 				self.to = [0, -size]
 				break
 			case 'KeyS':
 			case 'ArrowDown':
-				if (self.to[1]) {
-					self.moveSnake()
-					break
-				}
+				if (self.to[1]) break
 				self.to = [0, size]
 				break
 			case 'KeyA':
 			case 'ArrowLeft':
-				if (self.to[0]) {
-					self.moveSnake()
-					break
-				}
+				if (self.to[0]) break
 				self.to = [-size, 0]
 				break
 			case 'KeyD':
 			case 'ArrowRight':
-				if (self.to[0]) {
-					self.moveSnake()
-					break
-				}
+				if (self.to[0]) break
 				self.to = [size, 0]
 				break
 		}
+		self.moveSnake()
 	}
 
 	checkBoundaryCollision(x: number, y: number) {
@@ -133,7 +122,6 @@ export default class SnakeGame extends LeaferGame {
 
 		// 移动 head
 		head.set({x, y})
-
 		this.eatFoodHandler()
 	}
 
