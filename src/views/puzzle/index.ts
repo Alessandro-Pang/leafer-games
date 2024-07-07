@@ -90,6 +90,12 @@ export default class PuzzleGame extends LeaferGame {
 			DragEvent.setData({x, y, dragNode})
 		})
 
+		image.on(DragEvent.END, () => {
+			if (!dragNode) return
+			dragNode.set({zIndex: 1, x, y})
+			dragNode = null;
+		})
+
 		image.on(DropEvent.DROP, (evt) => {
 			const node = evt.target
 			const {x, y, dragNode} = evt.data || {}
@@ -105,18 +111,17 @@ export default class PuzzleGame extends LeaferGame {
 			if (node.y >= dragNode.y + (dragNode.height * 2) || node.y < dragNode.y - dragNode.height) {
 				return
 			}
-			// 交换数组位置
+			// 交换 current 值
 			const targetIdx = node.data.current;
 			const dragNodeIdx = dragNode.data.current;
 			dragNode.data.current = targetIdx;
 			node.data.current = dragNodeIdx;
-			this.images[targetIdx] = dragNode;
-			this.images[dragNodeIdx] = node;
+
 			// 交换节点位置
 			dragNode.set({x: node.x, y: node.y});
 			node.set({x, y});
 			// 检查是否成功
-			if (this.checkSort()) {
+			if (this.isCompleted()) {
 				message.success('恭喜你，完成拼图')
 				this.images.forEach((item) => {
 					item.draggable = false
@@ -124,18 +129,12 @@ export default class PuzzleGame extends LeaferGame {
 				})
 			}
 		})
-
-		image.on(DragEvent.END, () => {
-			if (!dragNode) return
-			dragNode.set({zIndex: 1, x, y})
-			dragNode = null;
-		})
 	}
 
 	/**
 	 * 检查排序
 	 */
-	checkSort() {
+	isCompleted() {
 		return this.images.every((item) => item.data!.current === item.data!.sortId);
 	}
 
