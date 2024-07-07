@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import {nextTick, ref} from "vue";
 import MarblesGame from "./index.ts";
-import {
-  Spin as ASpin,
-  Button as AButton,
-} from "ant-design-vue";
+import {Button as AButton} from "ant-design-vue";
 
 let marblesGame: MarblesGame | null = null
 
