@@ -9,9 +9,16 @@ import {
 let marblesGame: MarblesGame | null = null
 
 const isFirstStart = ref(true);
+const score = ref(0)
 
 function resetGame() {
-  marblesGame = new MarblesGame('game-wrapper', {step: 2, height: 420})
+  marblesGame = new MarblesGame('game-wrapper', {
+    step: 2,
+    height: 420,
+    updateScore: (val) => {
+      score.value = val
+    }
+  })
 }
 
 nextTick(() => resetGame())
@@ -27,6 +34,12 @@ function restartGame() {
 </script>
 
 <template>
+  <div class="score-board">
+    <div class="board">
+      <span>分数：</span>
+      <span class="score">{{score}}</span>
+    </div>
+  </div>
   <div class="main">
     <div id="game-wrapper" style="width: 100%; height: 100%"></div>
   </div>
@@ -43,6 +56,27 @@ function restartGame() {
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 600px;
+  height: 500px;
+}
+
+.score-board {
+  display: flex;
+  justify-content: center;
+}
+
+.score-board > .board {
+  height: 60px;
+  width: 120px;
+  text-align: center;
+  line-height: 60px;
+  background: #03d5fa;
+  color: yellow;
+  margin-top: 20px;
+  border-radius: 8px;
+  box-shadow: 4px 4px 6px 0 rgba(0,0,0,.2);
+}
+.score-board > .board > .score {
+  font-size: 24px;
+  font-weight: 600;
 }
 </style>

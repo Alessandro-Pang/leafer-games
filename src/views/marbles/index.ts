@@ -1,18 +1,23 @@
-import {Rect as LeaferRect, DragEvent, Ellipse as LeaferEllipse} from "leafer-ui";
+import {Rect as LeaferRect, DragEvent, Ellipse as LeaferEllipse, Star} from "leafer-ui";
 import LeaferGame, {GameOptions} from "../../utils/LeaferGame.ts";
 import {message} from "ant-design-vue";
 
 type MarblesGameConfig = {
-	step: number
+	step: number,
+	updateScore: (val: number) => void
 } & Partial<GameOptions>
 
 
-const randomInt = (min: number, max: number) => (Math.random() * max + min).toString()
+const randomInt = (min: number, max: number) => {
+	return Math.floor(Math.random() * (max - min + 1) + min)
+}
 
 export default class MarblesGame extends LeaferGame {
 	ball: LeaferEllipse | null = null;
 	board: LeaferRect | null = null;
 	timer: number | null = null
+	stars: Star[] = [];
+	score: number = 0
 
 	constructor(view: string, gameConfig: MarblesGameConfig) {
 		super(view, gameConfig);
@@ -79,9 +84,9 @@ export default class MarblesGame extends LeaferGame {
 	 */
 	randomMove(pos: 'dx' | 'dy') {
 		const cur = this.ball!.data[pos]
-		const step = Number.parseInt(randomInt(2, 4), 10)
-		if(pos === 'dy') {
-			if(this.ball!.y! > this.board!.height! - 100) {
+		const step = randomInt(2, 4)
+		if (pos === 'dy') {
+			if (this.ball!.y! > this.board!.height! - 100) {
 				return cur > 0 ? step : -step;
 			}
 		}
@@ -91,11 +96,11 @@ export default class MarblesGame extends LeaferGame {
 	moveBall() {
 		if (!this.ball || !this.wrapper) return
 		const strokeWidth = this.wrapper.strokeWidth! as number
-		const x = this.ball.x! + this.ball.data.dx;
-		const y = this.ball.y! + this.ball.data.dy;
+		const x = this.ball.x!;
+		const y = this.ball.y!;
 		// 底部检测
 		if (y > this.wrapper!.height! - strokeWidth * 2 - this.board!.height!) {
-			if (x + this.ball.width > this.board!.x! && x < this.board!.x! + this.board!.width!) {
+			if (x + this.ball.width! > this.board!.x! && x < this.board!.x! + this.board!.width!) {
 				this.ball.data.dy = -this.config.step
 				this.ball.data.dx = this.randomMove('dx')
 			} else if (y > this.wrapper!.height! - strokeWidth * 2) {
@@ -115,11 +120,56 @@ export default class MarblesGame extends LeaferGame {
 			this.ball.data.dx = this.randomMove('dx')
 			this.ball.data.dy = this.config.step;
 		}
-		this.ball.set({x, y})
+
+		// 暴力寻找
+		const starIndex = this.stars.findIndex((star) => {
+			const x1 = star.x! < x && star.x! + star.width! > x
+			const x2 = star.x! < x + this.ball!.width! && star.x! + star.width! > x + this.ball!.width!
+			const y1 = star.y! < y && star.y! + star.height! > y
+			const y2 = star.y! < y + this.ball!.height! && star.y! + star.height! > y + this.ball!.height!
+			return(x1 && y1) || (x2 && y2) || (x1 && y2) || (x2 && y1)
+		})
+		if (starIndex > -1) {
+			this.ball.data.dx *= -1;
+			this.ball.data.dy *= -1;
+			this.stars[starIndex].remove()
+			this.stars.splice(starIndex,1)
+			this.updateScore()
+			this.createStar()
+		}
+
+		this.ball.set({x: x + this.ball.data.dx, y: y + this.ball.data.dy})
+	}
+
+	createStar() {
+		if (!this.wrapper) return
+		const star = new Star({
+			width: 20,
+			height: 20,
+			x: randomInt(50, this.wrapper.width! - 50),
+			y: randomInt(50, this.wrapper.height! - 100),
+			fill: 'yellow',
+			stroke: 'red',
+			strokeWidth: 1,
+		})
+		this.wrapper.add(star)
+		this.stars.push(star)
+	}
+
+	updateScore() {
+		this.score++;
+		this.config.updateScore(this.score);
+	}
+
+	initStarList() {
+		for (let i = 0; i < 10; i++) {
+			this.createStar()
+		}
 	}
 
 	start() {
 		clearInterval(this.timer!)
+		this.initStarList()
 		this.timer = setInterval(() => {
 			this.moveBall()
 		}, 10)
@@ -129,7 +179,7 @@ export default class MarblesGame extends LeaferGame {
 		if (!this.timer) return
 		clearInterval(this.timer!)
 		this.timer = null
-		message.warn('游戏结束')
+		message.warn(`游戏结束, 最终得分：${this.score}`)
 	}
 
 	runGame() {
@@ -138,6 +188,9 @@ export default class MarblesGame extends LeaferGame {
 	}
 
 	restart() {
+		this.score = 0;
+		this.config.updateScore(0)
+		this.stars = []
 		clearInterval(this.timer!)
 		super.restart()
 		this.start()
