@@ -8,6 +8,7 @@ type MarblesGameConfig = {
 } & Partial<GameOptions>
 
 const size = 10
+let self:SnakeGame;
 
 export default class SnakeGame extends LeaferGame {
 	private snake: LeaferRect[] = [];
@@ -52,43 +53,42 @@ export default class SnakeGame extends LeaferGame {
 		this.addSnakeBody()
 	}
 
-	bindMovePositionEvent() {
-		window.addEventListener('keydown', (evt) => {
-			switch (evt.code) {
-				case 'KeyW':
-				case 'ArrowUp':
-					if (this.to[1]) {
-						this.moveSnake()
-						break
-					}
-					this.to = [0, -size]
+	bindMovePositionEvent(event: KeyboardEvent) {
+		if (self.timer === null) return
+		switch (event.code) {
+			case 'KeyW':
+			case 'ArrowUp':
+				if (self.to[1]) {
+					self.moveSnake()
 					break
-				case 'KeyS':
-				case 'ArrowDown':
-					if (this.to[1]) {
-						this.moveSnake()
-						break
-					}
-					this.to = [0, size]
+				}
+				self.to = [0, -size]
+				break
+			case 'KeyS':
+			case 'ArrowDown':
+				if (self.to[1]) {
+					self.moveSnake()
 					break
-				case 'KeyA':
-				case 'ArrowLeft':
-					if (this.to[0]) {
-						this.moveSnake()
-						break
-					}
-					this.to = [-size, 0]
+				}
+				self.to = [0, size]
+				break
+			case 'KeyA':
+			case 'ArrowLeft':
+				if (self.to[0]) {
+					self.moveSnake()
 					break
-				case 'KeyD':
-				case 'ArrowRight':
-					if (this.to[0]) {
-						this.moveSnake()
-						break
-					}
-					this.to = [size, 0]
+				}
+				self.to = [-size, 0]
+				break
+			case 'KeyD':
+			case 'ArrowRight':
+				if (self.to[0]) {
+					self.moveSnake()
 					break
-			}
-		})
+				}
+				self.to = [size, 0]
+				break
+		}
 	}
 
 	checkBoundaryCollision(x: number, y: number) {
@@ -180,11 +180,13 @@ export default class SnakeGame extends LeaferGame {
 		clearInterval(this.timer!)
 		this.timer = null
 		message.warn(`游戏结束, 最终得分：${this.score}`)
+		window.removeEventListener('keydown', this.bindMovePositionEvent)
 	}
 
 	runGame() {
+		self = this;
 		this.drawSnake()
-		this.bindMovePositionEvent()
+		window.addEventListener('keydown', this.bindMovePositionEvent)
 	}
 
 	restart() {
