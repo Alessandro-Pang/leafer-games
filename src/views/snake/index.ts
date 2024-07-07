@@ -57,22 +57,34 @@ export default class SnakeGame extends LeaferGame {
 			switch (evt.code) {
 				case 'KeyW':
 				case 'ArrowUp':
-					if (this.to[1]) break
+					if (this.to[1]) {
+						this.moveSnake()
+						break
+					}
 					this.to = [0, -size]
 					break
 				case 'KeyS':
 				case 'ArrowDown':
-					if (this.to[1]) break
+					if (this.to[1]) {
+						this.moveSnake()
+						break
+					}
 					this.to = [0, size]
 					break
 				case 'KeyA':
 				case 'ArrowLeft':
-					if (this.to[0]) break
+					if (this.to[0]) {
+						this.moveSnake()
+						break
+					}
 					this.to = [-size, 0]
 					break
 				case 'KeyD':
 				case 'ArrowRight':
-					if (this.to[0]) break
+					if (this.to[0]) {
+						this.moveSnake()
+						break
+					}
 					this.to = [size, 0]
 					break
 			}
@@ -142,7 +154,12 @@ export default class SnakeGame extends LeaferGame {
 		const randomY = randomInt(this.config.borderWidth!, this.wrapper?.height! - this.config.borderWidth!)
 		const x = Math.floor(randomX / size) * size
 		const y = Math.floor(randomY / size) * size
-		this.star!.set({x, y})
+		// 检查是否刷新在蛇的身体里
+		if (this.snake.some((item) => item.x === x && item.y === y)) {
+			this.refreshStar()
+		} else {
+			this.star!.set({x, y})
+		}
 	}
 
 	updateScore() {
