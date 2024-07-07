@@ -58,7 +58,13 @@ export default abstract class LeaferGame {
 			borderWidth,
 		}
 		// 修改内部容器宽高
-		this.gameBox!.style.height = `${wrapperHeight}px`
+		this.resetGameBoxHeight()
+	}
+
+	private resetGameBoxHeight() {
+		if (!this.gameBox) return
+		const height = this.getComputedStyle('height');
+		this.gameBox.style.height = `${height}px`
 	}
 
 	private createGameApp(view: HTMLElement) {
@@ -125,6 +131,7 @@ export default abstract class LeaferGame {
 		gameBoxWrapper?.removeChild(gameBoxWrapper?.children[0])
 		// 初始化游戏
 		this.init()
+		this.resetGameBoxHeight()
 		this.initGameWrapper()
 		this.runGame()
 	}

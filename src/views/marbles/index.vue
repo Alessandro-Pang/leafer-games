@@ -8,13 +8,18 @@ import {
 
 let marblesGame: MarblesGame | null = null
 
-const loading = ref(false);
+const isFirstStart = ref(true);
 
 function resetGame() {
-  marblesGame = new MarblesGame('game-wrapper', { step: 2, height: 420})
+  marblesGame = new MarblesGame('game-wrapper', {step: 2, height: 420})
 }
 
 nextTick(() => resetGame())
+
+function startGame() {
+  isFirstStart.value = false;
+  marblesGame?.start()
+}
 
 function restartGame() {
   marblesGame?.restart()
@@ -22,14 +27,12 @@ function restartGame() {
 </script>
 
 <template>
-  <div class="loading" v-if="loading">
-    <a-spin size="large" tip="正在加载游戏，请稍候..."/>
-  </div>
   <div class="main">
     <div id="game-wrapper" style="width: 100%; height: 100%"></div>
   </div>
   <div style="text-align: center; margin: 20px 0">
-    <a-button type="primary" @click="restartGame">重新开始</a-button>
+    <a-button type="primary" @click="startGame" v-if="isFirstStart">开始游戏</a-button>
+    <a-button type="primary" @click="restartGame" v-else>重新开始</a-button>
   </div>
 </template>
 
@@ -41,19 +44,5 @@ function restartGame() {
   justify-content: center;
   width: 100%;
   height: 600px;
-}
-
-.loading {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  text-align: center;
-  background: rgba(255, 255, 255, 0.4);
-  z-index: 999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 </style>
