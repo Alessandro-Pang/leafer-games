@@ -8,7 +8,7 @@ type MarblesGameConfig = {
 } & Partial<GameOptions>
 
 const size = 10
-let self:SnakeGame;
+let self: SnakeGame;
 
 export default class SnakeGame extends LeaferGame {
 	private snake: LeaferRect[] = [];
@@ -81,10 +81,11 @@ export default class SnakeGame extends LeaferGame {
 	}
 
 	checkBoundaryCollision(x: number, y: number) {
-		const checkRight = x + size > this.wrapper?.width! - this.config.borderWidth!
-		const checkLeft = x < this.config.borderWidth!
-		const checkTop = y < this.config.borderWidth!
-		const bottom = y + size > this.wrapper?.height! - this.config.borderWidth!
+		const borderWidth = this.config.borderWidth!
+		const checkRight = x + size > this.wrapper?.width! - borderWidth * 2
+		const checkLeft = x < borderWidth
+		const checkTop = y < borderWidth
+		const bottom = y + size > this.wrapper?.height! - borderWidth * 2
 		return checkRight || checkLeft || checkTop || bottom
 	}
 
