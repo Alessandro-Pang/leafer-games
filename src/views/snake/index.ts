@@ -24,11 +24,12 @@ export default class SnakeGame extends LeaferGame {
 	addSnakeBody() {
 		// @ts-ignore
 		const last = this.snake.at(-1);
+		if (!last) return
 		const body = new LeaferRect({
 			width: size,
 			height: size,
-			x: last.x - size,
-			y: last.y,
+			x: last.x! - size,
+			y: last.y!,
 			fill: 'black',
 		})
 		this.wrapper!.add(body);
@@ -56,38 +57,38 @@ export default class SnakeGame extends LeaferGame {
 			switch (evt.code) {
 				case 'KeyW':
 				case 'ArrowUp':
-					if(this.to[1]) break
+					if (this.to[1]) break
 					this.to = [0, -size]
 					break
 				case 'KeyS':
 				case 'ArrowDown':
-					if(this.to[1]) break
+					if (this.to[1]) break
 					this.to = [0, size]
 					break
 				case 'KeyA':
 				case 'ArrowLeft':
-					if(this.to[0]) break
+					if (this.to[0]) break
 					this.to = [-size, 0]
 					break
 				case 'KeyD':
 				case 'ArrowRight':
-					if(this.to[0]) break
+					if (this.to[0]) break
 					this.to = [size, 0]
 					break
 			}
 		})
 	}
 
-	checkBoundaryCollision(x: number, y: number){
+	checkBoundaryCollision(x: number, y: number) {
 		const checkRight = x + size > this.wrapper?.width! - this.config.borderWidth!
-		const checkLeft  = x < this.config.borderWidth!
+		const checkLeft = x < this.config.borderWidth!
 		const checkTop = y < this.config.borderWidth!
 		const bottom = y + size > this.wrapper?.height! - this.config.borderWidth!
 		return checkRight || checkLeft || checkTop || bottom
 	}
 
 	eatFoodHandler() {
-		const {x, y } = this.snake[0]
+		const {x, y} = this.snake[0]
 		if (x === this.star!.x && y === this.star!.y) {
 			this.addSnakeBody()
 			this.updateScore()
@@ -96,18 +97,18 @@ export default class SnakeGame extends LeaferGame {
 	}
 
 	checkBodyPosition() {
-		const [head,...body ] = this.snake
-		return body.some((item)=> item.x === head.x && item.y === head.y)
+		const [head, ...body] = this.snake
+		return body.some((item) => item.x === head.x && item.y === head.y)
 	}
 
 	moveSnake() {
 		const [head, ...body] = this.snake;
 		// 计算 head 移动位置
 		const x = head.x! + this.to[0]
-		const y= head.y! + this.to[1]
+		const y = head.y! + this.to[1]
 
 		// 边界碰撞检测
-		if(this.checkBoundaryCollision(x, y) || this.checkBodyPosition()) {
+		if (this.checkBoundaryCollision(x, y) || this.checkBodyPosition()) {
 			this.stop()
 			return
 		}
@@ -119,7 +120,7 @@ export default class SnakeGame extends LeaferGame {
 		}
 
 		// 移动 head
-		head.set({x , y})
+		head.set({x, y})
 
 		this.eatFoodHandler()
 	}
@@ -138,7 +139,7 @@ export default class SnakeGame extends LeaferGame {
 
 	refreshStar() {
 		const randomX = randomInt(this.config.borderWidth!, this.wrapper?.width! - this.config.borderWidth!)
-		const randomY =  randomInt(this.config.borderWidth!, this.wrapper?.height! - this.config.borderWidth!)
+		const randomY = randomInt(this.config.borderWidth!, this.wrapper?.height! - this.config.borderWidth!)
 		const x = Math.floor(randomX / size) * size
 		const y = Math.floor(randomY / size) * size
 		this.star!.set({x, y})
