@@ -94,6 +94,7 @@ export default abstract class LeaferGame {
 			stroke: '#3aafff',
 			strokeWidth: borderWidth,
 			fill: 'transparent',
+			overflow: 'hide'
 		});
 		this.app?.tree.add(this.wrapper)
 	}
