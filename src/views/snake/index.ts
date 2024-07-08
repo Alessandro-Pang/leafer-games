@@ -82,10 +82,10 @@ export default class SnakeGame extends LeaferGame {
 
 	checkBoundaryCollision(x: number, y: number) {
 		const borderWidth = this.config.borderWidth!
-		const checkRight = x + size > this.wrapper?.width! - borderWidth * 2
+		const checkRight = x + size > this.wrapper?.width! - borderWidth
 		const checkLeft = x < borderWidth
 		const checkTop = y < borderWidth
-		const bottom = y + size > this.wrapper?.height! - borderWidth * 2
+		const bottom = y + size > this.wrapper?.height! - borderWidth
 		return checkRight || checkLeft || checkTop || bottom
 	}
 
