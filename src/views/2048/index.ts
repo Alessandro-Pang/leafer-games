@@ -55,6 +55,7 @@ export default class FlyBirdGame extends LeaferGame {
 			this.addNumberBlock()
 			return
 		}
+		const value = 2//Math.pow(2, randomInt(1, 10))
 		// 创建数字方块
 		const block = new Box({
 			width: size,
@@ -63,11 +64,11 @@ export default class FlyBirdGame extends LeaferGame {
 			y,
 			fill: '#eee4da',
 			cornerRadius: 6,
-			data: {type: 'block', value: 2, cacheValue: 2},
+			data: {type: 'block', value: value, cacheValue: value},
 			zIndex: 2,
 			children: [{
 				tag: 'Text',
-				text: '2',
+				text: `${value}`,
 				width: size,
 				height: size,
 				fill: '#776e65',
@@ -296,6 +297,9 @@ export default class FlyBirdGame extends LeaferGame {
 	checkGameOver() {
 		const len = this.blockList.length;
 		if (len !== 16) return false;
+		// 从上到下，从左到右排序
+		// 这样我们就可以通过下标 i % 4 == (0, 3) 获取每行数据， Math.floor(i / 4) 获取每列数据
+		// 变相形成二维数组，同时我们只需要从左向右，从上到下检查是否有相同的即可。
 		this.wrapper?.children.sort((a, b) => {
 			return a.y! - b.y! === 0 ? a.x! - b.x! : a.y! - b.y!
 		});
@@ -303,9 +307,8 @@ export default class FlyBirdGame extends LeaferGame {
 			const col = i % 4;
 			const row = Math.floor(i / 4)
 			const currentVal = this.blockList[i]?.data!.value;
-			const rightVal = col !== 1 ? this.blockList[i + 1]?.data!.value : -1;
-			const bottomVal = row !== 4 ? this.blockList[row + col + 1]?.data!.value : -1;
-
+			const rightVal = col !== 3 ? this.blockList[i + 1]?.data!.value : -1;
+			const bottomVal = row !== 4 ? this.blockList[i + 4]?.data!.value : -1;
 			if (currentVal === rightVal || currentVal === bottomVal) return false
 		}
 		return true;
