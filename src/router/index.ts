@@ -5,6 +5,7 @@ import Puzzle from '../views/puzzle/index.vue'
 import Marbles from '../views/marbles/index.vue'
 import Snake from '../views/snake/index.vue'
 import FlyBird from '../views/fly-bird/index.vue'
+import Play2048 from '../views/2048/index.vue'
 
 export const routes = [
 	{path: '/', component: Home, meta: {title: '首页', hidden: true}},
@@ -12,6 +13,7 @@ export const routes = [
 	{path: '/marbles', component: Marbles, meta: {title: '弹球游戏'}},
 	{path: '/snake', component: Snake, meta: {title: '贪吃蛇'}},
 	{path: '/fly-bird', component: FlyBird, meta: {title: '飞翔的小鸟'}},
+	{path: '/2048', component: Play2048, meta: {title: '2048'}},
 ]
 
 const router = createRouter({

@@ -1,4 +1,5 @@
 import {App, Box} from "leafer-ui";
+import {isNil} from "./index.ts";
 
 export type GameOptions = {
 	width: number;
@@ -37,7 +38,7 @@ export default abstract class LeaferGame {
 	}
 
 	private initConfig(gameConfig: Partial<GameOptions>) {
-		const borderWidth = gameConfig.borderWidth || 10;
+		const borderWidth = isNil(gameConfig.borderWidth) ? 10 : gameConfig.borderWidth!;
 		const defaultSize = this.boxSize;
 		// 获取容器宽高
 		const style = this.getComputedStyle(['width', 'height']);
