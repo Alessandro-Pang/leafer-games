@@ -8,7 +8,7 @@ Leafer 小游戏中心，使用 Leafer 开发的小游戏库。
 
 ## 在线预览
 
-在线游戏地址：[http://alexpang.cn/leafer-games/](alexpang.cn/leafer-games/)
+在线游戏地址：[http://alexpang.cn/leafer-games/](http://alexpang.cn/leafer-games/)
 
 ## 游戏列表
 
@@ -18,6 +18,7 @@ Leafer 小游戏中心，使用 Leafer 开发的小游戏库。
 | ✅    | 弹球游戏  | 2024-07-07 |
 | ✅    | 贪吃蛇   | 2024-07-07 |
 | ✅    | 飞翔的小鸟 | 2024-07-08 |
+| ✅    | 2048  | 2024-07-09 |
 | ❌    | 五子棋   |            |
 | ❌    | 飞机大战  |            |
 
