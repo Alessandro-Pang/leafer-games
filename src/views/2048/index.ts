@@ -11,11 +11,12 @@ type MarblesGameConfig = {
 const colorList = ['#eee4da', '#ede0c8', '#f2b179', '#f59563', '#f67c5f', '#f65e3b', '#edcf72', '#edcc61', '#edc850', '#edc53f', '#edc22e']
 
 
-export default class FlyBirdGame extends LeaferGame {
+export default class Play2048Game extends LeaferGame {
 	private score: number = 0;
+	// 是否有移动的节点
 	private hasMove = false;
-	// 移动时的存储栈
-	private afterMove: IUI[] = [];
+	// 纪录已移动的节点存储栈
+	private alreadyMoved: IUI[] = [];
 
 	constructor(view: string, gameConfig: MarblesGameConfig) {
 		super(view, gameConfig);
@@ -126,93 +127,75 @@ export default class FlyBirdGame extends LeaferGame {
 
 	/**
 	 * 数字方块移动逻辑
-	 * @param block 移动的方块
 	 * @param axis x轴 还是 y轴 移动
 	 * @param computed 计算当前方块移动位置
 	 */
-	moveBlock(block: IUI, axis: 'x' | 'y', computed: (index: number) => number) {
-		let [i, position, lastIdx] = [0, 0, -1];
-		while (true) {
-			position = computed(i);
-			// 寻找同向是否方块
-			const index = this.afterMove.findIndex((node) => {
-				const another = axis === 'x' ? 'y' : 'x'
-				return node[axis] === position && node[another] === block[another]
-			});
-			if (index === -1) break;
-			lastIdx = index;
-			i++;
-		}
+	moveBlock(axis: 'x' | 'y', computed: (index: number, block: IUI) => number) {
+		for (const block of this.blockList) {
+			let [i, position, lastIdx] = [0, 0, -1];
+			block.data!.cacheValue = block.data!.value;
+			block.data!.isAdd = false;
 
-		if (block[axis]! !== position) {
-			this.hasMove = true;
-		}
-
-		// 判断相邻方块是否是相同数字
-		if (lastIdx > -1 && !this.afterMove[lastIdx].data!.isAdd) {
-			const preBlock = this.afterMove[lastIdx];
-			const value = preBlock.data!.cacheValue;
-
-			if (value === block.data!.value) {
-				this.updateBlock(preBlock);
-				block.remove();
-				return
+			while (true) {
+				position = computed(i, block);
+				// 寻找同向是否方块
+				const index = this.alreadyMoved.findIndex((node) => {
+					const another = axis === 'x' ? 'y' : 'x'
+					return node[axis] === position && node[another] === block[another]
+				});
+				if (index === -1) break;
+				lastIdx = index;
+				i++;
 			}
-		}
 
-		block[axis] = position;
-		this.afterMove.push(block);
+			if (block[axis]! !== position) {
+				this.hasMove = true;
+			}
+
+			// 判断相邻方块是否是相同数字
+			if (lastIdx > -1 && !this.alreadyMoved[lastIdx].data!.isAdd) {
+				const preBlock = this.alreadyMoved[lastIdx];
+				const value = preBlock.data!.cacheValue;
+
+				if (value === block.data!.value) {
+					block.remove();
+					this.hasMove = true;
+					this.updateBlock(preBlock);
+					continue
+				}
+			}
+
+			block[axis] = position;
+			this.alreadyMoved.push(block);
+		}
 	}
 
 	toTopMove() {
 		this.wrapper!.children.sort((a, b) => a.y! - b.y!);
 		const bw = this.config.borderWidth!;
-
-		for (const block of this.blockList) {
-			block.data!.cacheValue = block.data!.value;
-			block.data!.isAdd = false;
-			this.moveBlock(block, 'y', (i) => i * block.height! + i * 5 + (i + 1) * 5 + bw)
-		}
+		this.moveBlock('y', (i, block) => i * block.height! + i * 5 + (i + 1) * 5 + bw)
 	}
 
 	toBottomMove() {
 		this.wrapper!.children.sort((a, b) => b.y! - a.y!);
 		const bw = this.config.borderWidth!;
-
-		for (const block of this.blockList) {
-			block.data!.cacheValue = block.data!.value;
-			block.data!.isAdd = false;
-
-			this.moveBlock(block, 'y', (i) => {
-				return this.wrapper!.height! - ((i + 1) * block.height! + (i + 1) * 5 + i * 5 + bw);
-			})
-		}
+		this.moveBlock('y', (i, block) => {
+			return this.wrapper!.height! - ((i + 1) * block.height! + (i + 1) * 5 + i * 5 + bw);
+		})
 	}
 
 	toLeftMove() {
 		this.wrapper!.children.sort((a, b) => a.x! - b.x!);
 		const bw = this.config.borderWidth!;
-
-		for (const block of this.blockList) {
-			block.data!.cacheValue = block.data!.value;
-			block.data!.isAdd = false;
-
-			this.moveBlock(block, 'x', (i) => i * block.width! + i * 5 + (i + 1) * 5 + bw)
-		}
+		this.moveBlock('x', (i, block) => i * block.width! + i * 5 + (i + 1) * 5 + bw)
 	}
 
 	toRightMove() {
 		this.wrapper!.children.sort((a, b) => b.x! - a.x!);
 		const bw = this.config.borderWidth!;
-
-		for (const block of this.blockList) {
-			block.data!.cacheValue = block.data!.value;
-			block.data!.isAdd = false;
-
-			this.moveBlock(block, 'x', (i) => {
-				return this.wrapper!.width! - ((i + 1) * block.width! + (i + 1) * 5 + i * 5 + bw);
-			})
-		}
+		this.moveBlock('x', (i, block) => {
+			return this.wrapper!.width! - ((i + 1) * block.width! + (i + 1) * 5 + i * 5 + bw);
+		})
 	}
 
 
@@ -226,22 +209,18 @@ export default class FlyBirdGame extends LeaferGame {
 		this.wrapper.on(PointerEvent.DOWN, (evt) => {
 			this.hasMove = false
 			isDown = true;
-			const pos = {x: evt.x, y: evt.y};
-			this.wrapper?.worldToInner(pos);
-			downPos = {...pos};
+			downPos = {x: evt.x, y: evt.y};
 		})
 
 		this.wrapper.on(PointerEvent.MOVE, (evt) => {
 			if (!isDown) return
-			const pos = {x: evt.x, y: evt.y};
-			this.wrapper?.worldToInner(pos);
 			// 只有拖拽移动距离大于 60 时，才进行移动
-			if (Math.abs(pos.x - downPos.x) > 60) {
+			if (Math.abs(evt.x - downPos.x) > 60) {
 				isDown = false
-				pos.x - downPos.x > 0 ? this.toRightMove() : this.toLeftMove()
-			} else if (Math.abs(pos.y - downPos.y) > 60) {
+				evt.x - downPos.x > 0 ? this.toRightMove() : this.toLeftMove()
+			} else if (Math.abs(evt.y - downPos.y) > 60) {
 				isDown = false
-				pos.y - downPos.y > 0 ? this.toBottomMove() : this.toTopMove()
+				evt.y - downPos.y > 0 ? this.toBottomMove() : this.toTopMove()
 			}
 			if (this.hasMove) {
 				this.addNumberBlock()
@@ -251,7 +230,7 @@ export default class FlyBirdGame extends LeaferGame {
 		this.wrapper.on(PointerEvent.UP, () => {
 			isDown = false;
 			downPos = {x: 0, y: 0}
-			this.afterMove = []
+			this.alreadyMoved = []
 			if (this.checkGameOver()) {
 				this.stop()
 			}

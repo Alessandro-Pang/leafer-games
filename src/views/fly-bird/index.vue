@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import {nextTick, ref} from "vue";
-import SnakeGame from "./index.ts";
+import FlyBirdGame from "./index.ts";
 import {Button as AButton} from "ant-design-vue";
 
-let snakeGame: SnakeGame | null = null
+let flyBirdGame: FlyBirdGame | null = null
 
 const isFirstStart = ref(true);
 const score = ref(0)
 
 function resetGame() {
-  snakeGame = new SnakeGame('game-wrapper', {
+  flyBirdGame = new FlyBirdGame('game-wrapper', {
     borderWidth: 1,
     updateScore: (val) => {
       score.value = val
@@ -21,11 +21,11 @@ nextTick(() => resetGame())
 
 function startGame() {
   isFirstStart.value = false;
-  snakeGame?.start()
+  flyBirdGame?.start()
 }
 
 function restartGame() {
-  snakeGame?.restart()
+  flyBirdGame?.restart()
 }
 </script>
 
