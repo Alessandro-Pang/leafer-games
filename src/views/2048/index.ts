@@ -13,8 +13,9 @@ const colorList = ['#eee4da', '#ede0c8', '#f2b179', '#f59563', '#f67c5f', '#f65e
 
 export default class FlyBirdGame extends LeaferGame {
 	private score: number = 0;
-	private max: number = 2;
-	private hasMove = false
+	private hasMove = false;
+	// 移动时的存储栈
+	private afterMove: IUI[] = [];
 
 	constructor(view: string, gameConfig: MarblesGameConfig) {
 		super(view, gameConfig);
@@ -35,10 +36,9 @@ export default class FlyBirdGame extends LeaferGame {
 	}
 
 	computed(value: number) {
-		let max = value;
 		let n = 0
-		while (max > 1) {
-			max /= 2
+		while (value > 1) {
+			value /= 2
 			n++;
 		}
 		return n
@@ -110,7 +110,6 @@ export default class FlyBirdGame extends LeaferGame {
 	updateBlock(block: IUI) {
 		const value = block.data!.value;
 		const newValue = value * 2
-		this.max = Math.max(this.max, newValue)
 
 		const idx = this.computed(newValue) - 1
 		block.set({
@@ -125,131 +124,95 @@ export default class FlyBirdGame extends LeaferGame {
 		this.updateScore(newValue)
 	}
 
-	toTopMove() {
-		this.wrapper!.children.sort((a, b) => a.y! - b.y!)
-		const afterMove: IUI[] = []
-		const bw = this.config.borderWidth!
+	/**
+	 * 数字方块移动逻辑
+	 * @param block 移动的方块
+	 * @param axis x轴 还是 y轴 移动
+	 * @param computed 计算当前方块移动位置
+	 */
+	moveBlock(block: IUI, axis: 'x' | 'y', computed: (index: number) => number) {
+		let [i, position, lastIdx] = [0, 0, -1];
+		while (true) {
+			position = computed(i);
+			// 寻找同向是否方块
+			const index = this.afterMove.findIndex((node) => {
+				const another = axis === 'x' ? 'y' : 'x'
+				return node[axis] === position && node[another] === block[another]
+			});
+			if (index === -1) break;
+			lastIdx = index;
+			i++;
+		}
 
-		this.blockList.forEach((block) => {
-			let [i, y, index, lastIdx] = [0, 0, 0, -1]
+		if (block[axis]! !== position) {
+			this.hasMove = true;
+		}
+
+		// 判断相邻方块是否是相同数字
+		if (lastIdx > -1 && !this.afterMove[lastIdx].data!.isAdd) {
+			const preBlock = this.afterMove[lastIdx];
+			const value = preBlock.data!.cacheValue;
+
+			if (value === block.data!.value) {
+				this.updateBlock(preBlock);
+				block.remove();
+				return
+			}
+		}
+
+		block[axis] = position;
+		this.afterMove.push(block);
+	}
+
+	toTopMove() {
+		this.wrapper!.children.sort((a, b) => a.y! - b.y!);
+		const bw = this.config.borderWidth!;
+
+		for (const block of this.blockList) {
 			block.data!.cacheValue = block.data!.value;
 			block.data!.isAdd = false;
-			while (index !== -1) {
-				y = i * block.height! + i * 5 + (i + 1) * 5 + bw
-				index = afterMove.findIndex((node) => node.x === block.x && node.y === y)
-				lastIdx = index === -1 ? lastIdx : index
-				i++;
-			}
-			if (block.y !== y) {
-				this.hasMove = true
-			}
-			if (lastIdx > -1 && !afterMove[lastIdx].data!.isAdd) {
-				const preBlock = afterMove[lastIdx]
-				const value = preBlock.data!.cacheValue;
-				if (value === block.data!.value) {
-					this.updateBlock(preBlock)
-					block.remove()
-					return
-				}
-			}
-			block.y = y
-			afterMove.push(block)
-		})
+			this.moveBlock(block, 'y', (i) => i * block.height! + i * 5 + (i + 1) * 5 + bw)
+		}
 	}
 
 	toBottomMove() {
-		this.wrapper!.children.sort((a, b) => b.y! - a.y!)
-		const afterMove: IUI[] = []
-		const bw = this.config.borderWidth!
+		this.wrapper!.children.sort((a, b) => b.y! - a.y!);
+		const bw = this.config.borderWidth!;
 
-		this.blockList.forEach((block) => {
-			let [i, y, index, lastIdx] = [0, 0, 0, -1]
+		for (const block of this.blockList) {
 			block.data!.cacheValue = block.data!.value;
 			block.data!.isAdd = false;
-			while (index !== -1) {
-				i++;
-				y = this.wrapper!.height! - (i * block.height! + i * 5 + (i - 1) * 5 + bw)
-				index = afterMove.findIndex((node) => node.x === block.x && node.y === y)
-				lastIdx = index === -1 ? lastIdx : index
-			}
-			if (block.y !== y) {
-				this.hasMove = true
-			}
-			if (lastIdx > -1 && !afterMove[lastIdx].data!.isAdd) {
-				const preBlock = afterMove[lastIdx]
-				const value = preBlock.data!.cacheValue;
-				if (value === block.data!.value) {
-					this.updateBlock(preBlock)
-					block.remove()
-					return
-				}
-			}
-			block.y = y
-			afterMove.push(block)
-		})
+
+			this.moveBlock(block, 'y', (i) => {
+				return this.wrapper!.height! - ((i + 1) * block.height! + (i + 1) * 5 + i * 5 + bw);
+			})
+		}
 	}
 
 	toLeftMove() {
-		this.wrapper!.children.sort((a, b) => a.x! - b.x!)
-		const afterMove: IUI[] = []
-		const bw = this.config.borderWidth!
-		this.blockList.forEach((block) => {
-			let [i, x, index, lastIdx] = [0, 0, 0, -1]
+		this.wrapper!.children.sort((a, b) => a.x! - b.x!);
+		const bw = this.config.borderWidth!;
+
+		for (const block of this.blockList) {
 			block.data!.cacheValue = block.data!.value;
 			block.data!.isAdd = false;
-			while (index !== -1) {
-				x = i * block.width! + i * 5 + (i + 1) * 5 + bw
-				index = afterMove.findIndex((node) => node.x === x && node.y === block.y)
-				lastIdx = index === -1 ? lastIdx : index
-				i++;
-			}
-			if (block.x !== x) {
-				this.hasMove = true
-			}
-			if (lastIdx > -1 && !afterMove[lastIdx].data!.isAdd) {
-				const preBlock = afterMove[lastIdx]
-				const value = preBlock.data!.cacheValue;
-				if (value === block.data!.value) {
-					this.updateBlock(preBlock)
-					block.remove()
-					return
-				}
-			}
-			block.x = x
-			afterMove.push(block)
-		})
+
+			this.moveBlock(block, 'x', (i) => i * block.width! + i * 5 + (i + 1) * 5 + bw)
+		}
 	}
 
 	toRightMove() {
-		this.wrapper!.children.sort((a, b) => b.x! - a.x!)
-		const afterMove: IUI[] = []
-		const bw = this.config.borderWidth!
+		this.wrapper!.children.sort((a, b) => b.x! - a.x!);
+		const bw = this.config.borderWidth!;
 
-		this.blockList.forEach((block) => {
-			let [i, x, index, lastIdx] = [0, 0, 0, -1]
+		for (const block of this.blockList) {
 			block.data!.cacheValue = block.data!.value;
 			block.data!.isAdd = false;
-			while (index !== -1) {
-				i++;
-				x = this.wrapper!.width! - (i * block.width! + i * 5 + (i - 1) * 5 + bw)
-				index = afterMove.findIndex((node) => node.x === x && node.y === block.y)
-				lastIdx = index === -1 ? lastIdx : index
-			}
-			if (block.x !== x) {
-				this.hasMove = true
-			}
-			if (lastIdx > -1 && !afterMove[lastIdx].data!.isAdd) {
-				const preBlock = afterMove[lastIdx]
-				const value = preBlock.data!.cacheValue;
-				if (value === block.data!.value) {
-					this.updateBlock(preBlock)
-					block.remove()
-					return
-				}
-			}
-			block.x = x
-			afterMove.push(block)
-		})
+
+			this.moveBlock(block, 'x', (i) => {
+				return this.wrapper!.width! - ((i + 1) * block.width! + (i + 1) * 5 + i * 5 + bw);
+			})
+		}
 	}
 
 
@@ -288,6 +251,7 @@ export default class FlyBirdGame extends LeaferGame {
 		this.wrapper.on(PointerEvent.UP, () => {
 			isDown = false;
 			downPos = {x: 0, y: 0}
+			this.afterMove = []
 			if (this.checkGameOver()) {
 				this.stop()
 			}
