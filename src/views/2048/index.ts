@@ -1,4 +1,4 @@
-import {PointerEvent, Box, Text} from "leafer-ui";
+import {Box, Text} from "leafer-ui";
 import LeaferGame from "../../game-core/LeaferGame.ts";
 import {randomInt} from "../../utils";
 import {IUI} from "@leafer-ui/interface";
@@ -168,67 +168,61 @@ export default class Play2048Game extends LeaferGame<MarblesGameConfig> {
 		}
 	}
 
-	toTopMove() {
-		this.wrapper!.children.sort((a, b) => a.y! - b.y!);
-		this.moveBlock('y', (i, block) => i * block.height! + i * 5 + (i + 1) * 5)
+	onTapSlideBefore() {
+		this.hasMove = false
 	}
 
-	toBottomMove() {
-		this.wrapper!.children.sort((a, b) => b.y! - a.y!);
-		this.moveBlock('y', (i, block) => {
-			return this.wrapper!.height! - ((i + 1) * block.height! + (i + 1) * 5 + i * 5);
-		})
-	}
-
-	toLeftMove() {
-		this.wrapper!.children.sort((a, b) => a.x! - b.x!);
-		this.moveBlock('x', (i, block) => i * block.width! + i * 5 + (i + 1) * 5)
-	}
-
-	toRightMove() {
+	onTapSlideToRight() {
 		this.wrapper!.children.sort((a, b) => b.x! - a.x!);
 		this.moveBlock('x', (i, block) => {
 			return this.wrapper!.width! - ((i + 1) * block.width! + (i + 1) * 5 + i * 5);
 		})
 	}
 
+	onTapSlideToLeft() {
+		this.wrapper!.children.sort((a, b) => a.x! - b.x!);
+		this.moveBlock('x', (i, block) => i * block.width! + i * 5 + (i + 1) * 5)
+	}
 
-	/**
-	 * 绑定方向滑动事件
-	 */
-	bindTapMoveEvent() {
-		if (!this.wrapper) return
-		let isDown = false;
-		let downPos = {x: 0, y: 0}
-		this.wrapper.on(PointerEvent.DOWN, (evt) => {
-			this.hasMove = false
-			isDown = true;
-			downPos = {x: evt.x, y: evt.y};
-		})
+	onTapSlideToUp() {
+		this.wrapper!.children.sort((a, b) => a.y! - b.y!);
+		this.moveBlock('y', (i, block) => i * block.height! + i * 5 + (i + 1) * 5)
+	}
 
-		this.wrapper.on(PointerEvent.MOVE, (evt) => {
-			if (!isDown) return
-			// 只有拖拽移动距离大于 60 时，才进行移动
-			if (Math.abs(evt.x - downPos.x) > 60) {
-				isDown = false
-				evt.x - downPos.x > 0 ? this.toRightMove() : this.toLeftMove()
-			} else if (Math.abs(evt.y - downPos.y) > 60) {
-				isDown = false
-				evt.y - downPos.y > 0 ? this.toBottomMove() : this.toTopMove()
-			}
-			if (this.hasMove) {
-				this.addNumberBlock()
-			}
+	onTapSlideToDown() {
+		this.wrapper!.children.sort((a, b) => b.y! - a.y!);
+		this.moveBlock('y', (i, block) => {
+			return this.wrapper!.height! - ((i + 1) * block.height! + (i + 1) * 5 + i * 5);
 		})
+	}
 
-		this.wrapper.on(PointerEvent.UP, () => {
-			isDown = false;
-			downPos = {x: 0, y: 0}
-			this.alreadyMoved = []
-			if (this.checkGameOver()) {
-				this.stop()
-			}
-		})
+	onTapSlideAfter() {
+		if (this.hasMove) {
+			this.addNumberBlock()
+		}
+		this.alreadyMoved = []
+		if (this.checkGameOver()) {
+			this.stop()
+		}
+	}
+
+	onArrowKeyBefore() {
+		this.onTapSlideBefore()
+	}
+	onArrowKeyUp() {
+		this.onTapSlideToUp()
+	}
+	onArrowKeyDown() {
+		this.onTapSlideToDown()
+	}
+	onArrowKeyLeft() {
+		this.onTapSlideToLeft()
+	}
+	onArrowKeyRight() {
+		this.onTapSlideToRight()
+	}
+	onArrowKeyAfter() {
+		this.onTapSlideAfter()
 	}
 
 	checkGameOver() {
@@ -258,6 +252,7 @@ export default class Play2048Game extends LeaferGame<MarblesGameConfig> {
 
 	start() {
 		this.bindTapMoveEvent()
+		this.bindDirKeyboardEvent()
 	}
 
 	stop() {

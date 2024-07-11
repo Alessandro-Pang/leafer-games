@@ -12,18 +12,24 @@ export default abstract class LeaferGame<T> extends GameGraph<T> {
 	protected constructor(view: string, gameConfig: UserGameConfig<T>) {
 		super(view, gameConfig)
 		this.storage = new Storage()
-		if (this.config.allowDirectionBtn) {
-			this.dirKeyboardEvent = (event) => this.bindDirectionKeyboard(event)
-			window.addEventListener('keydown', this.dirKeyboardEvent)
-		}
-		this.bindTapMoveEvent()
+
 	}
 
+	bindDirKeyboardEvent() {
+		this.dirKeyboardEvent = (event) => this.directionKeyboardAction(event)
+		window.addEventListener('keydown', this.dirKeyboardEvent)
+	}
+	/**
+	 * 移除方向键按键事件
+	 */
+	removeDirKeyboardEvent() {
+		window.removeEventListener('keydown', this.dirKeyboardEvent)
+	}
 	/**
 	 * 绑定方向键按下事件
 	 * @param event
 	 */
-	bindDirectionKeyboard(event: KeyboardEvent) {
+	directionKeyboardAction(event: KeyboardEvent) {
 		this.onArrowKeyBefore()
 		switch (event.code) {
 			case 'KeyW':
@@ -49,44 +55,37 @@ export default abstract class LeaferGame<T> extends GameGraph<T> {
 	/**
 	 * 按下方向键之前
 	 */
-	onArrowKeyBefore() {
-	}
+	onArrowKeyBefore() {}
 
 	/**
 	 * 按下向上方向键
 	 */
-	onArrowKeyUp() {
-	}
+	onArrowKeyUp() {}
 
 	/**
 	 * 按下向下方向键
 	 */
-	onArrowKeyDown() {
-	}
+	onArrowKeyDown() {}
 
 	/**
 	 * 按下向左方向键
 	 */
-	onArrowKeyLeft() {
-	}
+	onArrowKeyLeft() {}
 
 	/**
 	 * 按下向右方向键
 	 */
-	onArrowKeyRight() {
-	}
+	onArrowKeyRight() {}
 
 	/**
 	 * 按下方向键之后
 	 */
-	onArrowKeyAfter() {
-	}
+	onArrowKeyAfter() {}
 
 	/**
 	 * 绑定方向滑动事件
 	 */
 	bindTapMoveEvent() {
-		if (!this.config.allowTapSlide) return
 		let isTapDown = false;
 		let tapDownPos = {x: 0, y: 0}
 		// 鼠标、手指按下
@@ -109,57 +108,45 @@ export default abstract class LeaferGame<T> extends GameGraph<T> {
 			} else {
 				evt.y - tapDownPos.y > 0 ? this.onTapSlideToDown() : this.onTapSlideToUp()
 			}
+			this.onTapSlideAfter()
 		})
 
 		// 鼠标、手指抬起
 		this.wrapper.on(PointerEvent.UP, () => {
 			isTapDown = false;
 			tapDownPos = {x: 0, y: 0}
-			this.onTapSlideAfter()
 		})
 	}
 
 	/**
 	 * 手指、鼠标拖动之前
 	 */
-	onTapSlideBefore() {
-	}
+	onTapSlideBefore() {}
 
 	/**
 	 * 手指、鼠标向右拖动
 	 */
-	onTapSlideToRight() {
-
-	}
+	onTapSlideToRight() {}
 
 	/**
 	 * 手指、鼠标向左拖动
 	 */
-	onTapSlideToLeft() {
-
-	}
+	onTapSlideToLeft() {}
 
 	/**
 	 * 手指、鼠标向上拖动
 	 */
-	onTapSlideToUp() {
-
-	}
+	onTapSlideToUp() {}
 
 	/**
 	 * 手指、鼠标向下拖动
 	 */
-	onTapSlideToDown() {
-
-	}
+	onTapSlideToDown() {}
 
 	/**
 	 * 手指、鼠标拖动之后
 	 */
-	onTapSlideAfter() {
-
-	}
-
+	onTapSlideAfter() {}
 
 	/**
 	 * 开始游戏
@@ -194,15 +181,6 @@ export default abstract class LeaferGame<T> extends GameGraph<T> {
 
 	async removeGameState(key: string) {
 		await this.storage.remove(key)
-	}
-
-	/**
-	 * 移除方向键按键事件
-	 */
-	removeDirKeyboardEvent() {
-		if (this.config.allowDirectionBtn) {
-			window.removeEventListener('keydown', this.dirKeyboardEvent)
-		}
 	}
 
 	restart() {

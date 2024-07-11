@@ -18,8 +18,8 @@ export type SizeConfig = number | [number, number] | BaseSize
  * 跨平台画布大小配置
  */
 export type PlatformSizeConfig = {
-	mobile: SizeConfig,
-	pc: SizeConfig
+	mobile?: SizeConfig,
+	pc?: SizeConfig
 }
 
 /**
@@ -30,10 +30,6 @@ export type UserGameConfig<T> = {
 	x?: number;
 	y?: number;
 	borderWidth?: number;
-	// 允许启用方向键?
-	allowDirectionBtn?: boolean;
-	// 允许启用拖动方向？
-	allowTapSlide?: boolean;
 } & T
 
 /**
@@ -44,8 +40,6 @@ export type GameGraphConfig<T> = {
 	x: number;
 	y: number;
 	borderWidth: number;
-	allowDirectionBtn: boolean;
-	allowTapSlide: boolean;
 } & T
 
 /**
@@ -135,7 +129,7 @@ export default abstract class GameGraph<T> {
 			const platformSize = size as PlatformSizeConfig
 			if (this.isMobile && platformSize.mobile) {
 				serialize = serializeSize(platformSize.mobile)
-			} else {
+			} else if (platformSize.pc) {
 				serialize = serializeSize(platformSize.pc)
 			}
 		}
@@ -156,14 +150,12 @@ export default abstract class GameGraph<T> {
 		const defaultY = (h / 2) - height / 2
 		const ggc = this.gameGraphConfig
 		this.gameGraphConfig = {
-			...ugc,
 			...ggc,
+			...ugc,
 			size: [width, height],
 			x: ugc.x || ggc.x || defaultX,
 			y: ugc.y || ggc.y || defaultY,
 			borderWidth: isNil(ugc.borderWidth) ? 10 : ugc.borderWidth!,
-			allowDirectionBtn: ugc.allowDirectionBtn || false,
-			allowTapSlide: ugc.allowTapSlide || false
 		}
 	}
 

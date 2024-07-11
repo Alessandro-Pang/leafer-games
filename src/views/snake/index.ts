@@ -9,7 +9,6 @@ type MarblesGameConfig = {
 }
 
 const size = 10
-let self: SnakeGame;
 
 export default class SnakeGame extends LeaferGame<MarblesGameConfig> {
 	private snake: LeaferRect[] = [];
@@ -53,32 +52,43 @@ export default class SnakeGame extends LeaferGame<MarblesGameConfig> {
 		this.addSnakeBody()
 		this.addSnakeBody()
 	}
+	/**
+	 * 按下向上方向键
+	 */
+	onArrowKeyUp() {
+		if (this.to[1]) return
+		this.to = [0, -size]
+	}
 
-	bindMovePositionEvent(event: KeyboardEvent) {
-		if (self.timer === null) return
-		switch (event.code) {
-			case 'KeyW':
-			case 'ArrowUp':
-				if (self.to[1]) break
-				self.to = [0, -size]
-				break
-			case 'KeyS':
-			case 'ArrowDown':
-				if (self.to[1]) break
-				self.to = [0, size]
-				break
-			case 'KeyA':
-			case 'ArrowLeft':
-				if (self.to[0]) break
-				self.to = [-size, 0]
-				break
-			case 'KeyD':
-			case 'ArrowRight':
-				if (self.to[0]) break
-				self.to = [size, 0]
-				break
-		}
-		self.moveSnake()
+	/**
+	 * 按下向下方向键
+	 */
+	onArrowKeyDown() {
+		if (this.to[1]) return
+		this.to = [0, size]
+	}
+
+	/**
+	 * 按下向左方向键
+	 */
+	onArrowKeyLeft() {
+		if (this.to[0]) return
+		this.to = [-size, 0]
+	}
+
+	/**
+	 * 按下向右方向键
+	 */
+	onArrowKeyRight() {
+		if (this.to[0]) return
+		this.to = [size, 0]
+	}
+
+	/**
+	 * 按下方向键之后
+	 */
+	onArrowKeyAfter() {
+		this.moveSnake()
 	}
 
 	checkBoundaryCollision(x: number, y: number) {
@@ -159,6 +169,7 @@ export default class SnakeGame extends LeaferGame<MarblesGameConfig> {
 	start() {
 		clearInterval(this.timer!)
 		this.createStar()
+		this.bindDirKeyboardEvent()
 		this.timer = setInterval(() => {
 			this.moveSnake()
 		}, 200)
@@ -169,7 +180,7 @@ export default class SnakeGame extends LeaferGame<MarblesGameConfig> {
 		clearInterval(this.timer!)
 		this.timer = null
 		message.warn(`游戏结束, 最终得分：${this.score}`)
-		window.removeEventListener('keydown', this.bindMovePositionEvent)
+		this.removeDirKeyboardEvent()
 	}
 
 	paused() {
@@ -179,9 +190,7 @@ export default class SnakeGame extends LeaferGame<MarblesGameConfig> {
 	resume() {
 	}
 	initGameMap() {
-		self = this;
 		this.drawSnake()
-		window.addEventListener('keydown', this.bindMovePositionEvent)
 	}
 
 	restart() {
@@ -190,6 +199,7 @@ export default class SnakeGame extends LeaferGame<MarblesGameConfig> {
 		this.snake = []
 		this.to = [size, 0]
 		clearInterval(this.timer!)
+		this.removeDirKeyboardEvent()
 		super.restart()
 		this.start()
 	}

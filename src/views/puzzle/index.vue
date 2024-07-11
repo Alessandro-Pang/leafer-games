@@ -11,6 +11,7 @@ import {
   SelectOption as ASelectOption
 } from "ant-design-vue";
 import {UndoOutlined} from '@ant-design/icons-vue'
+import {PlatformSizeConfig} from "../../game-core/GameGraph.ts";
 
 const count = ref(4);
 const img = ref('')
@@ -19,7 +20,7 @@ const loading = ref(false);
 let puzzleGame: PuzzleGame | null = null;
 
 function fetchImage(boxSize: number): Promise<string> {
-  if(!boxSize) {
+  if (!boxSize) {
     throw new Error('boxSize 不能为空')
   }
   loading.value = true
@@ -40,21 +41,25 @@ function fetchImage(boxSize: number): Promise<string> {
   })
 }
 
+const size: PlatformSizeConfig = {
+  mobile: [window.innerWidth, window.innerWidth]
+}
+
 function initGame() {
-  puzzleGame = new PuzzleGame('game-wrapper', {count: count.value, url: ''});
+  puzzleGame = new PuzzleGame('game-wrapper', {count: count.value, url: '', size});
   // 通过内部实现获取 boxSize
   fetchImage(puzzleGame.wrapper.width!).then((url) => {
-    puzzleGame?.resetGame({count: count.value, url})
+    puzzleGame?.resetGame({count: count.value, url, size})
   })
 }
 
 function changeDifficulty() {
-  puzzleGame?.resetGame({count: count.value, url: img.value})
+  puzzleGame?.resetGame({count: count.value, url: img.value, size})
 }
 
 function resetGame() {
   fetchImage(puzzleGame?.wrapper.width!).then(() => {
-    puzzleGame?.resetGame({count: count.value, url: img.value});
+    puzzleGame?.resetGame({count: count.value, url: img.value, size});
   })
 }
 
