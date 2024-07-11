@@ -1,31 +1,30 @@
 import {PointerEvent, Box, Text} from "leafer-ui";
-import LeaferGame, {GameOptions} from "../../utils/LeaferGame.ts";
+import LeaferGame from "../../game-core/LeaferGame.ts";
 import {randomInt} from "../../utils";
 import {IUI} from "@leafer-ui/interface";
 import {message} from "ant-design-vue";
+import {UserGameConfig} from "../../game-core/GameGraph.ts";
 
 type MarblesGameConfig = {
 	updateScore: (val: number) => void
-} & Partial<GameOptions>
+}
 
 const colorList = ['#eee4da', '#ede0c8', '#f2b179', '#f59563', '#f67c5f', '#f65e3b', '#edcf72', '#edcc61', '#edc850', '#edc53f', '#edc22e']
 
-
-export default class Play2048Game extends LeaferGame {
+export default class Play2048Game extends LeaferGame<MarblesGameConfig> {
 	private score: number = 0;
 	// 是否有移动的节点
 	private hasMove = false;
 	// 纪录已移动的节点存储栈
 	private alreadyMoved: IUI[] = [];
 
-	constructor(view: string, gameConfig: MarblesGameConfig) {
+	constructor(view: string, gameConfig: UserGameConfig<MarblesGameConfig>) {
 		super(view, gameConfig);
-		this.runGame()
+		this.initGameMap();
 	}
 
 	get gridSize() {
-		const width = this.wrapper!.width! - this.config.borderWidth! * 2
-		return width / 4;
+		return this.wrapper.width! / 4;
 	}
 
 	get gridList(): IUI[] {
@@ -85,13 +84,12 @@ export default class Play2048Game extends LeaferGame {
 
 	drawGrid() {
 		if (!this.wrapper) return
-		const borderWidth = this.config.borderWidth!
 		for (let i = 0; i < Math.pow(4, 2); i++) {
 			const gridBox = new Box({
 				width: this.gridSize,
 				height: this.gridSize,
-				x: (i % 4) * this.gridSize + borderWidth,
-				y: Math.floor(i / 4) * this.gridSize + borderWidth,
+				x: (i % 4) * this.gridSize,
+				y: Math.floor(i / 4) * this.gridSize,
 				data: {type: 'grid'},
 				zIndex: 1,
 				children: [{
@@ -172,29 +170,25 @@ export default class Play2048Game extends LeaferGame {
 
 	toTopMove() {
 		this.wrapper!.children.sort((a, b) => a.y! - b.y!);
-		const bw = this.config.borderWidth!;
-		this.moveBlock('y', (i, block) => i * block.height! + i * 5 + (i + 1) * 5 + bw)
+		this.moveBlock('y', (i, block) => i * block.height! + i * 5 + (i + 1) * 5)
 	}
 
 	toBottomMove() {
 		this.wrapper!.children.sort((a, b) => b.y! - a.y!);
-		const bw = this.config.borderWidth!;
 		this.moveBlock('y', (i, block) => {
-			return this.wrapper!.height! - ((i + 1) * block.height! + (i + 1) * 5 + i * 5 + bw);
+			return this.wrapper!.height! - ((i + 1) * block.height! + (i + 1) * 5 + i * 5);
 		})
 	}
 
 	toLeftMove() {
 		this.wrapper!.children.sort((a, b) => a.x! - b.x!);
-		const bw = this.config.borderWidth!;
-		this.moveBlock('x', (i, block) => i * block.width! + i * 5 + (i + 1) * 5 + bw)
+		this.moveBlock('x', (i, block) => i * block.width! + i * 5 + (i + 1) * 5)
 	}
 
 	toRightMove() {
 		this.wrapper!.children.sort((a, b) => b.x! - a.x!);
-		const bw = this.config.borderWidth!;
 		this.moveBlock('x', (i, block) => {
-			return this.wrapper!.width! - ((i + 1) * block.width! + (i + 1) * 5 + i * 5 + bw);
+			return this.wrapper!.width! - ((i + 1) * block.width! + (i + 1) * 5 + i * 5);
 		})
 	}
 
@@ -271,8 +265,15 @@ export default class Play2048Game extends LeaferGame {
 		message.warn(`游戏结束, 最终得分：${this.score}`)
 	}
 
-	runGame() {
-		this.wrapper!.set({
+	paused() {
+
+	}
+
+	resume() {
+	}
+
+	initGameMap() {
+		this.bbox.set({
 			fill: '#bbada0',
 			cornerRadius: 8,
 			stroke: '#bbada0'

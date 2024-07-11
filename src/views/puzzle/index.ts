@@ -1,24 +1,24 @@
 import {DropEvent, Rect as LeaferRect, DragEvent} from "leafer-ui";
 import type {IUI} from '@leafer-ui/interface'
 import {message} from 'ant-design-vue';
-import LeaferGame, {GameOptions} from "../../utils/LeaferGame.ts";
+import LeaferGame from "../../game-core/LeaferGame.ts";
+import {UserGameConfig} from "../../game-core/GameGraph.ts";
 
 type PuzzleGameOption = {
 	count: number,
 	url: string
-} & Partial<GameOptions>
+}
 
-export default class PuzzleGame extends LeaferGame {
+export default class PuzzleGame extends LeaferGame<PuzzleGameOption> {
 	private images: IUI[] = [];
 
-	constructor(view: string, gameConfig: PuzzleGameOption) {
+	constructor(view: string, gameConfig: UserGameConfig<PuzzleGameOption>) {
 		super(view, gameConfig);
-		if (!gameConfig.url) return
-		this.runGame()
+		this.initGameMap();
 	}
 
-	runGame() {
-		if (!this.wrapper) return
+	initGameMap() {
+		if (!this.config.url) return
 		for (let i = 0; i < Math.pow(this.config.count, 2); i++) {
 			const image = this.createImage(i, this.config.count);
 			this.images.push(image)
@@ -33,16 +33,15 @@ export default class PuzzleGame extends LeaferGame {
 	 * @param count
 	 */
 	createImage(idx: number, count: number) {
-		const borderWidth = this.config.borderWidth || 0;
-		const width = (this.config.width! - borderWidth * 2) / count;
-		const height = (this.config.height! - borderWidth * 2) / count;
+		const width = this.wrapper.width! / count;
+		const height = this.wrapper.height! / count;
 		const x = (idx % count) * width;
 		const y = Math.floor(idx / count) * height;
 		return new LeaferRect({
 			width,
 			height,
-			x: x + borderWidth,
-			y: y + borderWidth,
+			x,
+			y,
 			fill: {
 				type: 'image',
 				url: this.config.url,
@@ -138,11 +137,26 @@ export default class PuzzleGame extends LeaferGame {
 		return this.images.every((item) => item.data!.current === item.data!.sortId);
 	}
 
+	start() {
+	}
+
+	stop(){
+
+	}
+
+	paused() {
+
+	}
+
+	resume() {
+	}
+
+
 	/**
 	 * 重置游戏
 	 * @param gameConfig
 	 */
-	resetGame(gameConfig: PuzzleGameOption) {
+	resetGame(gameConfig: UserGameConfig<PuzzleGameOption>) {
 		this.images = []
 		this.config = gameConfig;
 		this.restart()

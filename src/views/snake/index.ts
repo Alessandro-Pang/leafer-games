@@ -1,25 +1,26 @@
 import {Rect as LeaferRect, Star} from "leafer-ui";
-import LeaferGame, {GameOptions} from "../../utils/LeaferGame.ts";
+import LeaferGame from "../../game-core/LeaferGame.ts";
 import {message} from "ant-design-vue";
 import {randomInt} from "../../utils";
+import {UserGameConfig} from "../../game-core/GameGraph.ts";
 
 type MarblesGameConfig = {
 	updateScore: (val: number) => void
-} & Partial<GameOptions>
+}
 
 const size = 10
 let self: SnakeGame;
 
-export default class SnakeGame extends LeaferGame {
+export default class SnakeGame extends LeaferGame<MarblesGameConfig> {
 	private snake: LeaferRect[] = [];
 	private timer: number | null = null;
 	private star: Star | null = null;
 	private score: number = 0;
 	private to = [size, 0];
 
-	constructor(view: string, gameConfig: MarblesGameConfig) {
+	constructor(view: string, gameConfig: UserGameConfig<MarblesGameConfig>) {
 		super(view, gameConfig);
-		this.runGame()
+		this.initGameMap()
 	}
 
 	addSnakeBody() {
@@ -81,11 +82,10 @@ export default class SnakeGame extends LeaferGame {
 	}
 
 	checkBoundaryCollision(x: number, y: number) {
-		const borderWidth = this.config.borderWidth!
-		const checkRight = x + size > this.wrapper?.width! - borderWidth
-		const checkLeft = x < borderWidth
-		const checkTop = y < borderWidth
-		const bottom = y + size > this.wrapper?.height! - borderWidth
+		const checkRight = x + size > this.wrapper.width!
+		const checkLeft = x < 0
+		const checkTop = y < 0
+		const bottom = y + size > this.wrapper.height!
 		return checkRight || checkLeft || checkTop || bottom
 	}
 
@@ -139,8 +139,8 @@ export default class SnakeGame extends LeaferGame {
 	}
 
 	refreshStar() {
-		const randomX = randomInt(this.config.borderWidth!, this.wrapper?.width! - this.config.borderWidth!)
-		const randomY = randomInt(this.config.borderWidth!, this.wrapper?.height! - this.config.borderWidth!)
+		const randomX = randomInt(0, this.wrapper.width!)
+		const randomY = randomInt(0, this.wrapper.height!)
 		const x = Math.floor(randomX / size) * size
 		const y = Math.floor(randomY / size) * size
 		// 检查是否刷新在蛇的身体里
@@ -172,7 +172,13 @@ export default class SnakeGame extends LeaferGame {
 		window.removeEventListener('keydown', this.bindMovePositionEvent)
 	}
 
-	runGame() {
+	paused() {
+
+	}
+
+	resume() {
+	}
+	initGameMap() {
 		self = this;
 		this.drawSnake()
 		window.addEventListener('keydown', this.bindMovePositionEvent)

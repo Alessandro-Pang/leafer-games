@@ -1,14 +1,15 @@
 import {Rect as LeaferRect, PointerEvent} from "leafer-ui";
-import LeaferGame, {GameOptions} from "../../utils/LeaferGame.ts";
+import LeaferGame from "../../game-core/LeaferGame.ts";
 import {message} from "ant-design-vue";
 import birdImg from '../../assets/fly-bird/bird.svg'
 import {randomInt} from "../../utils";
+import {UserGameConfig} from "../../game-core/GameGraph.ts";
 
 type MarblesGameConfig = {
 	updateScore: (val: number) => void
-} & Partial<GameOptions>
+}
 
-export default class FlyBirdGame extends LeaferGame {
+export default class FlyBirdGame extends LeaferGame<MarblesGameConfig> {
 	private runStatus: boolean = false;
 	private score: number = 0;
 	private bird: LeaferRect | null = null;
@@ -18,21 +19,20 @@ export default class FlyBirdGame extends LeaferGame {
 	private speed = 2;
 	private startTime = 0;
 
-	constructor(view: string, gameConfig: MarblesGameConfig) {
+	constructor(view: string, gameConfig: UserGameConfig<MarblesGameConfig>) {
 		super(view, gameConfig);
-		this.runGame()
+		this.initGameMap();
 	}
 
 	birdDownEvent() {
 		if (!this.runStatus || !this.bird) return
 		this.bird.y! += this.speed
 		// 边界检测
-		const bw = this.config.borderWidth!
-		const height = this.wrapper?.height! - bw;
+		const height = this.wrapper.height!;
 		if (this.bird.y! + this.bird.height! >= height) {
 			this.bird.y = height - this.bird.height!
-		} else if (this.bird.y! <= bw) {
-			this.bird.y = bw
+		} else if (this.bird.y! <= 0) {
+			this.bird.y = 0
 		}
 	}
 
@@ -74,14 +74,13 @@ export default class FlyBirdGame extends LeaferGame {
 
 	moveWall() {
 		if (!this.runStatus) return
-		const borderWidth = this.config.borderWidth || 0;
 		this.wallList.forEach(([topWall, bottomWall], index) => {
 			if (this.check(index)) {
 				this.stop()
 				return
 			}
 
-			if (topWall.x! + topWall.width! < borderWidth) {
+			if (topWall.x! + topWall.width! < 0) {
 				topWall.remove()
 				bottomWall.remove()
 				this.wallList.splice(index, 1)
@@ -102,14 +101,13 @@ export default class FlyBirdGame extends LeaferGame {
 
 	drawWall(x: number) {
 		const spaceSize = 150
-		const bw = this.config.borderWidth || 0
-		const height = this.wrapper?.height! - bw;
+		const height = this.wrapper.height!;
 		const topWallHeight = randomInt(50, 300)
 		const topWall = new LeaferRect({
 			width: 50,
 			height: topWallHeight,
 			x,
-			y: bw,
+			y: 0,
 			fill: '#333'
 		})
 
@@ -161,7 +159,14 @@ export default class FlyBirdGame extends LeaferGame {
 		message.warn(`游戏结束, 最终得分：${this.score}`)
 	}
 
-	runGame() {
+	paused() {
+
+	}
+
+	resume() {
+	}
+
+	initGameMap() {
 		this.drawBird()
 		this.drawWall(400)
 		this.bindUpFlyEvent()

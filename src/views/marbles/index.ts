@@ -1,27 +1,28 @@
 import {Rect as LeaferRect, DragEvent, Ellipse as LeaferEllipse, Star} from "leafer-ui";
-import LeaferGame, {GameOptions} from "../../utils/LeaferGame.ts";
+import LeaferGame from "../../game-core/LeaferGame.ts";
 import {message} from "ant-design-vue";
+import {UserGameConfig} from "../../game-core/GameGraph.ts";
 
 type MarblesGameConfig = {
 	step: number,
 	updateScore: (val: number) => void
-} & Partial<GameOptions>
+}
 
 
 const randomInt = (min: number, max: number) => {
 	return Math.floor(Math.random() * (max - min + 1) + min)
 }
 
-export default class MarblesGame extends LeaferGame {
+export default class MarblesGame extends LeaferGame<MarblesGameConfig> {
 	ball: LeaferEllipse | null = null;
 	board: LeaferRect | null = null;
 	timer: number | null = null
 	stars: Star[] = [];
 	score: number = 0
 
-	constructor(view: string, gameConfig: MarblesGameConfig) {
+	constructor(view: string, gameConfig: UserGameConfig<MarblesGameConfig>) {
 		super(view, gameConfig);
-		this.runGame()
+		this.initGameMap();
 	}
 
 	bindBoardEvent(board: LeaferRect) {
@@ -29,16 +30,15 @@ export default class MarblesGame extends LeaferGame {
 			const node = evt.target;
 			if (!node || !this.wrapper) return
 			const {width = 0, height = 0} = this.wrapper || {}
-			node.y = height - 20
-			const strokeWidth = this.wrapper.strokeWidth as number
+			node.y = height - node.height
 			// 右边界检测
-			if (node.x + node.width > width - strokeWidth) {
-				node.x = width - node.width - strokeWidth
+			if (node.x + node.width > width) {
+				node.x = width - node.width
 				return
 			}
 			// 左边界检测
-			if (node.x < strokeWidth) {
-				node.x = strokeWidth
+			if (node.x < 0) {
+				node.x = 0
 				return
 			}
 		})
@@ -51,7 +51,7 @@ export default class MarblesGame extends LeaferGame {
 			height: 10,
 			width,
 			x: this.wrapper.width! / 2 - width / 2,
-			y: this.wrapper.height! - 20,
+			y: this.wrapper.height! - 10,
 			fill: 'blue',
 			draggable: true,
 			dragBounds: 'parent',
@@ -62,7 +62,6 @@ export default class MarblesGame extends LeaferGame {
 	}
 
 	drawBall() {
-		if (!this.wrapper) return
 		const step = this.config.step;
 		// 让小球的初始轨迹随机一些
 		const dx = Math.random() > 0.5 ? -step : step
@@ -70,7 +69,7 @@ export default class MarblesGame extends LeaferGame {
 			width: 20,
 			height: 20,
 			fill: 'red',
-			y: this.wrapper.height! - 40,
+			y: this.wrapper.height! - 30,
 			x: this.wrapper.width! / 2 - 10,
 			data: {dx, dy: -step}
 		})
@@ -94,29 +93,28 @@ export default class MarblesGame extends LeaferGame {
 	}
 
 	moveBall() {
-		if (!this.ball || !this.wrapper) return
-		const strokeWidth = this.wrapper.strokeWidth! as number
+		if (!this.ball) return
 		const x = this.ball.x!;
 		const y = this.ball.y!;
 		// 底部检测
-		if (y > this.wrapper!.height! - strokeWidth * 2 - this.board!.height!) {
+		if (y > this.wrapper.height! - this.board!.height! - this.ball.height!) {
 			if (x + this.ball.width! > this.board!.x! && x < this.board!.x! + this.board!.width!) {
 				this.ball.data.dy = -this.config.step
 				this.ball.data.dx = this.randomMove('dx')
-			} else if (y > this.wrapper!.height! - strokeWidth * 2) {
+			} else if (y > this.wrapper!.height! - this.ball.height!) {
 				this.stop()
 				return
 			}
 		}
-		if (x < strokeWidth - 2) {
+		if (x < this.ball.width!) {
 			this.ball.data.dx = this.config.step
 			this.ball.data.dy = this.randomMove('dy')
 		}
-		if (x > this.wrapper!.width! - strokeWidth * 2 - 2) {
+		if (x > this.wrapper.width! - this.ball.width!) {
 			this.ball.data.dx = -this.config.step
 			this.ball.data.dy = this.randomMove('dy')
 		}
-		if (y < strokeWidth - 2) {
+		if (y < this.ball.height!) {
 			this.ball.data.dx = this.randomMove('dx')
 			this.ball.data.dy = this.config.step;
 		}
@@ -137,12 +135,10 @@ export default class MarblesGame extends LeaferGame {
 			this.updateScore()
 			this.createStar()
 		}
-
 		this.ball.set({x: x + this.ball.data.dx, y: y + this.ball.data.dy})
 	}
 
 	createStar() {
-		if (!this.wrapper) return
 		const star = new Star({
 			width: 20,
 			height: 20,
@@ -168,6 +164,7 @@ export default class MarblesGame extends LeaferGame {
 	}
 
 	start() {
+		console.log(this)
 		clearInterval(this.timer!)
 		this.initStarList()
 		this.timer = setInterval(() => {
@@ -182,15 +179,22 @@ export default class MarblesGame extends LeaferGame {
 		message.warn(`游戏结束, 最终得分：${this.score}`)
 	}
 
-	runGame() {
+	paused() {
+
+	}
+
+	resume() {
+	}
+
+	initGameMap() {
 		this.drawBoard()
 		this.drawBall()
 	}
 
 	restart() {
 		this.score = 0;
-		this.config.updateScore(0)
 		this.stars = []
+		this.config.updateScore(0)
 		clearInterval(this.timer!)
 		super.restart()
 		this.start()

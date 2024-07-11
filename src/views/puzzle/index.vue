@@ -19,6 +19,9 @@ const loading = ref(false);
 let puzzleGame: PuzzleGame | null = null;
 
 function fetchImage(boxSize: number): Promise<string> {
+  if(!boxSize) {
+    throw new Error('boxSize 不能为空')
+  }
   loading.value = true
   return new Promise((resolve) => {
     fetch(`https://picsum.photos/${boxSize}/${boxSize}`)
@@ -40,7 +43,7 @@ function fetchImage(boxSize: number): Promise<string> {
 function initGame() {
   puzzleGame = new PuzzleGame('game-wrapper', {count: count.value, url: ''});
   // 通过内部实现获取 boxSize
-  fetchImage(puzzleGame.config.width!).then((url) => {
+  fetchImage(puzzleGame.wrapper.width!).then((url) => {
     puzzleGame?.resetGame({count: count.value, url})
   })
 }
@@ -50,7 +53,7 @@ function changeDifficulty() {
 }
 
 function resetGame() {
-  fetchImage(puzzleGame?.config.width!).then(() => {
+  fetchImage(puzzleGame?.wrapper.width!).then(() => {
     puzzleGame?.resetGame({count: count.value, url: img.value});
   })
 }
@@ -74,7 +77,7 @@ nextTick(() => initGame())
       </div>
     </a-col>
     <a-col :lg="16" :md="24" style="margin-top: 20px; width: 100%">
-      <div id="game-wrapper" style="width: 100%; height: 100%"></div>
+      <div id="game-wrapper" style="width: 100%; height: 500px"></div>
     </a-col>
   </a-row>
   <div style="text-align: center; margin: 20px 0">
