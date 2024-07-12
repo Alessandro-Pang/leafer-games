@@ -1,206 +1,212 @@
-import {Rect as LeaferRect, Star} from "leafer-ui";
-import LeaferGame from "../../game-core/LeaferGame.ts";
-import {message} from "ant-design-vue";
-import {randomInt} from "../../utils";
-import {UserGameConfig} from "../../game-core/GameGraph.ts";
+import { Rect as LeaferRect, Star } from 'leafer-ui';
+import { message } from 'ant-design-vue';
+import LeaferGame from '../../game-core/LeaferGame.ts';
+import { randomInt } from '../../utils';
+import { UserGameConfig } from '../../game-core/GameGraph.ts';
 
 type MarblesGameConfig = {
-	updateScore: (val: number) => void
-}
+  updateScore: (val: number) => void
+};
 
-const size = 10
+const size = 10;
 
 export default class SnakeGame extends LeaferGame<MarblesGameConfig> {
-	private snake: LeaferRect[] = [];
-	private timer: number | null = null;
-	private star: Star | null = null;
-	private score: number = 0;
-	private to = [size, 0];
+  private snake: LeaferRect[] = [];
 
-	constructor(view: string, gameConfig: UserGameConfig<MarblesGameConfig>) {
-		super(view, gameConfig);
-		this.initGameMap()
-	}
+  private timer: number | null = null;
 
-	addSnakeBody() {
-		// @ts-ignore
-		const last = this.snake.at(-1);
-		if (!last) return
-		const body = new LeaferRect({
-			width: size,
-			height: size,
-			x: last.x! - size,
-			y: last.y!,
-			fill: 'black',
-		})
-		this.wrapper!.add(body);
-		this.snake.push(body);
-	}
+  private star: Star | null = null;
 
-	drawSnake() {
-		const head = new LeaferRect({
-			width: size,
-			height: size,
-			x: 100,
-			y: 100,
-			fill: 'red',
-			zIndex: 10
-		})
-		this.wrapper!.add(head);
-		this.snake.push(head);
-		this.addSnakeBody()
-		this.addSnakeBody()
-		this.addSnakeBody()
-	}
-	/**
+  private score: number = 0;
+
+  private to = [size, 0];
+
+  constructor(view: string, gameConfig: UserGameConfig<MarblesGameConfig>) {
+    super(view, gameConfig);
+    this.initGameMap();
+  }
+
+  addSnakeBody() {
+    // @ts-ignore
+    const last = this.snake.at(-1);
+    if (!last) return;
+    const body = new LeaferRect({
+      width: size,
+      height: size,
+      x: last.x! - size,
+      y: last.y!,
+      fill: 'black',
+    });
+    this.wrapper!.add(body);
+    this.snake.push(body);
+  }
+
+  drawSnake() {
+    const head = new LeaferRect({
+      width: size,
+      height: size,
+      x: 100,
+      y: 100,
+      fill: 'red',
+      zIndex: 10,
+    });
+    this.wrapper!.add(head);
+    this.snake.push(head);
+    this.addSnakeBody();
+    this.addSnakeBody();
+    this.addSnakeBody();
+  }
+
+  /**
 	 * 按下向上方向键
 	 */
-	onArrowKeyUp() {
-		if (this.to[1]) return
-		this.to = [0, -size]
-	}
+  onArrowKeyUp() {
+    if (this.to[1]) return;
+    this.to = [0, -size];
+  }
 
-	/**
+  /**
 	 * 按下向下方向键
 	 */
-	onArrowKeyDown() {
-		if (this.to[1]) return
-		this.to = [0, size]
-	}
+  onArrowKeyDown() {
+    if (this.to[1]) return;
+    this.to = [0, size];
+  }
 
-	/**
+  /**
 	 * 按下向左方向键
 	 */
-	onArrowKeyLeft() {
-		if (this.to[0]) return
-		this.to = [-size, 0]
-	}
+  onArrowKeyLeft() {
+    if (this.to[0]) return;
+    this.to = [-size, 0];
+  }
 
-	/**
+  /**
 	 * 按下向右方向键
 	 */
-	onArrowKeyRight() {
-		if (this.to[0]) return
-		this.to = [size, 0]
-	}
+  onArrowKeyRight() {
+    if (this.to[0]) return;
+    this.to = [size, 0];
+  }
 
-	/**
+  /**
 	 * 按下方向键之后
 	 */
-	onArrowKeyAfter() {
-		this.moveSnake()
-	}
+  onArrowKeyAfter() {
+    this.moveSnake();
+  }
 
-	checkBoundaryCollision(x: number, y: number) {
-		const checkRight = x + size > this.wrapper.width!
-		const checkLeft = x < 0
-		const checkTop = y < 0
-		const bottom = y + size > this.wrapper.height!
-		return checkRight || checkLeft || checkTop || bottom
-	}
+  checkBoundaryCollision(x: number, y: number) {
+    const checkRight = x + size > this.wrapper.width!;
+    const checkLeft = x < 0;
+    const checkTop = y < 0;
+    const bottom = y + size > this.wrapper.height!;
+    return checkRight || checkLeft || checkTop || bottom;
+  }
 
-	eatFoodHandler() {
-		const {x, y} = this.snake[0]
-		if (x === this.star!.x && y === this.star!.y) {
-			this.addSnakeBody()
-			this.updateScore()
-			this.refreshStar()
-		}
-	}
+  eatFoodHandler() {
+    const { x, y } = this.snake[0];
+    if (x === this.star!.x && y === this.star!.y) {
+      this.addSnakeBody();
+      this.updateScore();
+      this.refreshStar();
+    }
+  }
 
-	checkBodyPosition() {
-		const [head, ...body] = this.snake
-		return body.some((item) => item.x === head.x && item.y === head.y)
-	}
+  checkBodyPosition() {
+    const [head, ...body] = this.snake;
+    return body.some((item) => item.x === head.x && item.y === head.y);
+  }
 
-	moveSnake() {
-		const [head, ...body] = this.snake;
-		// 计算 head 移动位置
-		const x = head.x! + this.to[0]
-		const y = head.y! + this.to[1]
+  moveSnake() {
+    const [head, ...body] = this.snake;
+    // 计算 head 移动位置
+    const x = head.x! + this.to[0];
+    const y = head.y! + this.to[1];
 
-		// 边界碰撞检测
-		if (this.checkBoundaryCollision(x, y) || this.checkBodyPosition()) {
-			this.stop()
-			return
-		}
+    // 边界碰撞检测
+    if (this.checkBoundaryCollision(x, y) || this.checkBodyPosition()) {
+      this.stop();
+      return;
+    }
 
-		// 先移动 body
-		for (let i = body.length - 1; i >= 0; i--) {
-			const pre = this.snake[i]
-			body[i].set({x: pre.x, y: pre.y})
-		}
+    // 先移动 body
+    for (let i = body.length - 1; i >= 0; i--) {
+      const pre = this.snake[i];
+      body[i].set({ x: pre.x, y: pre.y });
+    }
 
-		// 移动 head
-		head.set({x, y})
-		this.eatFoodHandler()
-	}
+    // 移动 head
+    head.set({ x, y });
+    this.eatFoodHandler();
+  }
 
-	createStar() {
-		const star = new Star({
-			width: size,
-			height: size,
-			fill: 'yellow',
-			stroke: 'red',
-		})
-		this.star = star
-		this.wrapper?.add(star)
-		this.refreshStar()
-	}
+  createStar() {
+    const star = new Star({
+      width: size,
+      height: size,
+      fill: 'yellow',
+      stroke: 'red',
+    });
+    this.star = star;
+    this.wrapper?.add(star);
+    this.refreshStar();
+  }
 
-	refreshStar() {
-		const randomX = randomInt(0, this.wrapper.width!)
-		const randomY = randomInt(0, this.wrapper.height!)
-		const x = Math.floor(randomX / size) * size
-		const y = Math.floor(randomY / size) * size
-		// 检查是否刷新在蛇的身体里
-		if (this.snake.some((item) => item.x === x && item.y === y)) {
-			this.refreshStar()
-		} else {
-			this.star!.set({x, y})
-		}
-	}
+  refreshStar() {
+    const randomX = randomInt(0, this.wrapper.width!);
+    const randomY = randomInt(0, this.wrapper.height!);
+    const x = Math.floor(randomX / size) * size;
+    const y = Math.floor(randomY / size) * size;
+    // 检查是否刷新在蛇的身体里
+    if (this.snake.some((item) => item.x === x && item.y === y)) {
+      this.refreshStar();
+    } else {
+      this.star!.set({ x, y });
+    }
+  }
 
-	updateScore() {
-		this.score++;
-		this.config.updateScore(this.score);
-	}
+  updateScore() {
+    this.score++;
+    this.config.updateScore(this.score);
+  }
 
-	start() {
-		clearInterval(this.timer!)
-		this.createStar()
-		this.bindDirKeyboardEvent()
-		this.timer = setInterval(() => {
-			this.moveSnake()
-		}, 200)
-	}
+  start() {
+    clearInterval(this.timer!);
+    this.createStar();
+    this.bindDirKeyboardEvent();
+    this.timer = setInterval(() => {
+      this.moveSnake();
+    }, 200);
+  }
 
-	stop() {
-		if (!this.timer) return
-		clearInterval(this.timer!)
-		this.timer = null
-		message.warn(`游戏结束, 最终得分：${this.score}`)
-		this.removeDirKeyboardEvent()
-	}
+  stop() {
+    if (!this.timer) return;
+    clearInterval(this.timer!);
+    this.timer = null;
+    message.warn(`游戏结束, 最终得分：${this.score}`);
+    this.removeDirKeyboardEvent();
+  }
 
-	paused() {
+  paused() {
 
-	}
+  }
 
-	resume() {
-	}
-	initGameMap() {
-		this.drawSnake()
-	}
+  resume() {
+  }
 
-	restart() {
-		this.score = 0;
-		this.config.updateScore(0)
-		this.snake = []
-		this.to = [size, 0]
-		clearInterval(this.timer!)
-		this.removeDirKeyboardEvent()
-		super.restart()
-		this.start()
-	}
+  initGameMap() {
+    this.drawSnake();
+  }
+
+  restart() {
+    this.score = 0;
+    this.config.updateScore(0);
+    this.snake = [];
+    this.to = [size, 0];
+    clearInterval(this.timer!);
+    this.removeDirKeyboardEvent();
+    super.restart();
+    this.start();
+  }
 }

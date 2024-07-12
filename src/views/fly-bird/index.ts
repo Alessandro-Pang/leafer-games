@@ -1,184 +1,191 @@
-import {Rect as LeaferRect, PointerEvent} from "leafer-ui";
-import LeaferGame from "../../game-core/LeaferGame.ts";
-import {message} from "ant-design-vue";
-import birdImg from '../../assets/fly-bird/bird.svg'
-import {randomInt} from "../../utils";
-import {UserGameConfig} from "../../game-core/GameGraph.ts";
+import { Rect as LeaferRect, PointerEvent } from 'leafer-ui';
+import { message } from 'ant-design-vue';
+import LeaferGame from '../../game-core/LeaferGame.ts';
+import birdImg from '../../assets/fly-bird/bird.svg';
+import { randomInt } from '../../utils';
+import { UserGameConfig } from '../../game-core/GameGraph.ts';
 
 type MarblesGameConfig = {
-	updateScore: (val: number) => void
-}
+  updateScore: (val: number) => void
+};
 
 export default class FlyBirdGame extends LeaferGame<MarblesGameConfig> {
-	private runStatus: boolean = false;
-	private score: number = 0;
-	private bird: LeaferRect | null = null;
-	private wallList: LeaferRect[][] = [];
+  private runStatus: boolean = false;
 
-	private mainAnimateId: number | null = null;
-	private speed = 2;
-	private startTime = 0;
+  private score: number = 0;
 
-	constructor(view: string, gameConfig: UserGameConfig<MarblesGameConfig>) {
-		super(view, gameConfig);
-		this.initGameMap();
-	}
+  private bird: LeaferRect | null = null;
 
-	birdDownEvent() {
-		if (!this.runStatus || !this.bird) return
-		this.bird.y! += this.speed
-		// 边界检测
-		const height = this.wrapper.height!;
-		if (this.bird.y! + this.bird.height! >= height) {
-			this.bird.y = height - this.bird.height!
-		} else if (this.bird.y! <= 0) {
-			this.bird.y = 0
-		}
-	}
+  private wallList: LeaferRect[][] = [];
 
-	bindUpFlyEvent() {
-		this.wrapper?.on(PointerEvent.DOWN, () => {
-			if (!this.runStatus) return
-			this.speed -= 8
-		})
+  private mainAnimateId: number | null = null;
 
-		this.wrapper?.on(PointerEvent.UP, () => {
-			if (!this.runStatus) return
-			this.speed = 2
-		})
-	}
+  private speed = 2;
 
-	drawBird() {
-		const bird = new LeaferRect({
-			width: 50,
-			height: 50,
-			x: 50,
-			y: 200,
-			fill: {
-				type: 'image',
-				url: birdImg
-			}
-		})
-		this.bird = bird
-		this.wrapper?.add(bird)
-	}
+  private startTime = 0;
 
-	check(index: number) {
-		const [topWall, bottomWall] = this.wallList[index]
-		const {x = 0, y = 0, height = 0, width = 0} = this.bird!
-		if (topWall.x! + topWall.width! * 0.6 <= x) return false;
-		const top = y < topWall.height! && x + width >= topWall.x!;
-		const bottom = y + height > bottomWall.y! && x + width >= topWall.x!;
-		return top || bottom
-	}
+  constructor(view: string, gameConfig: UserGameConfig<MarblesGameConfig>) {
+    super(view, gameConfig);
+    this.initGameMap();
+  }
 
-	moveWall() {
-		if (!this.runStatus) return
-		this.wallList.forEach(([topWall, bottomWall], index) => {
-			if (this.check(index)) {
-				this.stop()
-				return
-			}
+  birdDownEvent() {
+    if (!this.runStatus || !this.bird) return;
+    this.bird.y! += this.speed;
+    // 边界检测
+    const height = this.wrapper.height!;
+    if (this.bird.y! + this.bird.height! >= height) {
+		  this.bird.y = height - this.bird.height!;
+    } else if (this.bird.y! <= 0) {
+		  this.bird.y = 0;
+    }
+  }
 
-			if (topWall.x! + topWall.width! < 0) {
-				topWall.remove()
-				bottomWall.remove()
-				this.wallList.splice(index, 1)
-				return
-			}
+  bindUpFlyEvent() {
+    this.wrapper?.on(PointerEvent.DOWN, () => {
+      if (!this.runStatus) return;
+      this.speed -= 8;
+    });
 
-			// 根据最后一个的位置，新增墙
-			if (index === this.wallList.length - 1) {
-				if (topWall.x! < this.wrapper?.width! / 2) {
-					this.drawWall(this.wrapper!.width!)
-				}
-			}
+    this.wrapper?.on(PointerEvent.UP, () => {
+      if (!this.runStatus) return;
+      this.speed = 2;
+    });
+  }
 
-			topWall.x! -= 1
-			bottomWall.x! -= 1
-		})
-	}
+  drawBird() {
+    const bird = new LeaferRect({
+      width: 50,
+      height: 50,
+      x: 50,
+      y: 200,
+      fill: {
+        type: 'image',
+        url: birdImg,
+      },
+    });
+    this.bird = bird;
+    this.wrapper?.add(bird);
+  }
 
-	drawWall(x: number) {
-		const spaceSize = 150
-		const height = this.wrapper.height!;
-		const topWallHeight = randomInt(50, 300)
-		const topWall = new LeaferRect({
-			width: 50,
-			height: topWallHeight,
-			x,
-			y: 0,
-			fill: '#333'
-		})
+  check(index: number) {
+    const [topWall, bottomWall] = this.wallList[index];
+    const {
+      x = 0, y = 0, height = 0, width = 0,
+    } = this.bird!;
+    if (topWall.x! + topWall.width! * 0.6 <= x) return false;
+    const top = y < topWall.height! && x + width >= topWall.x!;
+    const bottom = y + height > bottomWall.y! && x + width >= topWall.x!;
+    return top || bottom;
+  }
 
-		const bottomWall = new LeaferRect({
-			width: 50,
-			height: height - topWallHeight - spaceSize,
-			x,
-			y: topWallHeight + spaceSize,
-			fill: '#333'
-		})
-		this.wallList.push([topWall, bottomWall])
-		this.wrapper?.add(topWall)
-		this.wrapper?.add(bottomWall)
-	}
+  moveWall() {
+    if (!this.runStatus) return;
+    this.wallList.forEach(([topWall, bottomWall], index) => {
+      if (this.check(index)) {
+        this.stop();
+        return;
+      }
 
-	updateScore() {
-		const time = Date.now() - this.startTime
-		this.score = Math.floor(time / 1000);
-		this.config.updateScore(this.score);
-	}
+      if (topWall.x! + topWall.width! < 0) {
+        topWall.remove();
+        bottomWall.remove();
+        this.wallList.splice(index, 1);
+        return;
+      }
 
-	start() {
-		this.runStatus = true;
-		this.startTime = Date.now();
-		this.birdDownEvent()
-		this.runAnimate()
-	}
+      // 根据最后一个的位置，新增墙
+      if (index === this.wallList.length - 1) {
+        if (topWall.x! < this.wrapper?.width! / 2) {
+          this.drawWall(this.wrapper!.width!);
+        }
+      }
 
-	runAnimate() {
-		if (!this.runStatus) return
-		this.mainAnimateId = window.requestAnimationFrame(() => {
-			this.moveWall()
-			this.birdDownEvent()
-			this.updateScore()
-			this.runAnimate()
-		})
-	}
+      topWall.x! -= 1;
+      bottomWall.x! -= 1;
+    });
+  }
 
-	cancelAnimate() {
-		if (this.mainAnimateId) {
-			window.cancelAnimationFrame(this.mainAnimateId);
-		}
-		this.mainAnimateId = null;
-		this.runStatus = false
-	}
+  drawWall(x: number) {
+    const spaceSize = 150;
+    const height = this.wrapper.height!;
+    const topWallHeight = randomInt(50, 300);
+    const topWall = new LeaferRect({
+      width: 50,
+      height: topWallHeight,
+      x,
+      y: 0,
+      fill: '#333',
+    });
 
-	stop() {
-		this.cancelAnimate()
-		message.warn(`游戏结束, 最终得分：${this.score}`)
-	}
+    const bottomWall = new LeaferRect({
+      width: 50,
+      height: height - topWallHeight - spaceSize,
+      x,
+      y: topWallHeight + spaceSize,
+      fill: '#333',
+    });
+    this.wallList.push([topWall, bottomWall]);
+    this.wrapper?.add(topWall);
+    this.wrapper?.add(bottomWall);
+  }
 
-	paused() {
+  updateScore() {
+    const time = Date.now() - this.startTime;
+    this.score = Math.floor(time / 1000);
+    this.config.updateScore(this.score);
+  }
 
-	}
+  start() {
+    this.runStatus = true;
+    this.startTime = Date.now();
+    this.birdDownEvent();
+    this.runAnimate();
+  }
 
-	resume() {
-	}
+  runAnimate() {
+    if (!this.runStatus) return;
+    this.mainAnimateId = window.requestAnimationFrame(() => {
+      this.moveWall();
+      this.birdDownEvent();
+      this.updateScore();
+      this.runAnimate();
+    });
+  }
 
-	initGameMap() {
-		this.drawBird()
-		this.drawWall(400)
-		this.bindUpFlyEvent()
-	}
+  cancelAnimate() {
+    if (this.mainAnimateId) {
+      window.cancelAnimationFrame(this.mainAnimateId);
+    }
+    this.mainAnimateId = null;
+    this.runStatus = false;
+  }
 
-	restart() {
-		this.speed = 2;
-		this.score = 0;
-		this.wallList = []
-		this.config.updateScore(0)
-		this.cancelAnimate()
-		super.restart()
-		this.start()
-	}
+  stop() {
+    this.cancelAnimate();
+    message.warn(`游戏结束, 最终得分：${this.score}`);
+  }
+
+  paused() {
+
+  }
+
+  resume() {
+  }
+
+  initGameMap() {
+    this.drawBird();
+    this.drawWall(400);
+    this.bindUpFlyEvent();
+  }
+
+  restart() {
+    this.speed = 2;
+    this.score = 0;
+    this.wallList = [];
+    this.config.updateScore(0);
+    this.cancelAnimate();
+    super.restart();
+    this.start();
+  }
 }

@@ -10,7 +10,7 @@ const score = ref(0)
 
 function resetGame() {
   marblesGame = new MarblesGame('game-wrapper', {
-    step: 2,
+    step: 5,
     size: [0, 420],
     updateScore: (val) => {
       score.value = val
