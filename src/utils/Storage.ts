@@ -15,8 +15,8 @@ export default class Storage {
   }
 
   /**
-	 * 校验浏览器是否支持 localStorage
-	 */
+   * 校验浏览器是否支持 localStorage
+   */
   testStorageSupported() {
     if (!this.storage) return false;
     const testStr = '__TEST_LOCALSTORAGE__';
@@ -40,9 +40,9 @@ export default class Storage {
   }
 
   /**
-	 * 删除指定存储内容
-	 * @param { String } key 存储键
-	 */
+   * 删除指定存储内容
+   * @param { String } key 存储键
+   */
   async remove(key: string) {
     this.storage.removeItem(`${this.namespace}${key}`);
   }

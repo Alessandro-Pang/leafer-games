@@ -1,31 +1,39 @@
+<!--
+ * @Author: zi.yang
+ * @Date: 2024-07-06 14:16:02
+ * @LastEditors: zi.yang
+ * @LastEditTime: 2024-07-06 14:41:37
+ * @Description: 飞翔的小鸟
+ * @FilePath: /leafer-games/src/views/fly-bird/index.vue
+-->
 <script setup lang="ts">
-import {nextTick, ref} from "vue";
-import FlyBirdGame from "./index.ts";
-import {Button as AButton} from "ant-design-vue";
+import { nextTick, ref } from 'vue';
+import { Button as AButton } from 'ant-design-vue';
+import FlyBirdGame from '.';
 
-let flyBirdGame: FlyBirdGame | null = null
+let flyBirdGame: FlyBirdGame | null = null;
 
 const isFirstStart = ref(true);
-const score = ref(0)
+const score = ref(0);
 
 function resetGame() {
   flyBirdGame = new FlyBirdGame('game-wrapper', {
     borderWidth: 1,
     updateScore: (val) => {
-      score.value = val
-    }
-  })
+      score.value = val;
+    },
+  });
 }
 
-nextTick(() => resetGame())
+nextTick(() => resetGame());
 
 function startGame() {
   isFirstStart.value = false;
-  flyBirdGame?.start()
+  flyBirdGame?.start();
 }
 
 function restartGame() {
-  flyBirdGame?.restart()
+  flyBirdGame?.restart();
 }
 </script>
 
@@ -33,15 +41,20 @@ function restartGame() {
   <div class="score-board">
     <div class="board">
       <span>分数：</span>
-      <span class="score">{{ score }}</span>
+      <span class="score">
+        {{ score }}
+      </span>
     </div>
   </div>
   <div class="main">
     <div id="game-wrapper" style="width: 100%; height: 100%"></div>
   </div>
   <div style="text-align: center; margin: 20px 0">
-    <a-button type="primary" @click="startGame" v-if="isFirstStart">开始游戏</a-button>
-    <a-button type="primary" @click="restartGame" v-else>重新开始</a-button>
+    <a-button v-if="isFirstStart" type="primary" @click="startGame">
+      开始游戏
+    </a-button><a-button v-else type="primary" @click="restartGame">
+      重新开始
+    </a-button>
   </div>
 </template>
 

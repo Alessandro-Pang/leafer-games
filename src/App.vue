@@ -1,19 +1,29 @@
+<!--
+ * @Author: zi.yang
+ * @Date: 2024-07-06 14:16:02
+ * @LastEditors: zi.yang
+ * @LastEditTime: 2024-07-06 14:42:14
+ * @Description: App
+ * @FilePath: /leafer-games/src/App.vue
+-->
 <script setup lang="ts">
-import {useRoute} from "vue-router";
-import {computed} from "vue";
+import { useRoute } from 'vue-router';
+import { computed } from 'vue';
 
-const route = useRoute()
-const name = computed(() => route.meta.title)
+const route = useRoute();
+const name = computed(() => route.meta.title);
 </script>
 
 <template>
   <header>
     <router-link to="/">
-      <h3 style="display: inline-block">Leafer 小游戏中心 - {{ name }}</h3>
+      <h3 style="display: inline-block">
+        Leafer 小游戏中心 - {{ name }}
+      </h3>
     </router-link>
   </header>
   <div class="view-box">
-    <router-view/>
+    <router-view />
   </div>
 </template>
 

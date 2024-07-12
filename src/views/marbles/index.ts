@@ -1,7 +1,16 @@
-import { Rect as LeaferRect, Ellipse as LeaferEllipse, Star } from 'leafer-ui';
+/*
+ * @Author: zi.yang
+ * @Date: 2024-07-06 11:34:25
+ * @LastEditors: zi.yang
+ * @LastEditTime: 2024-07-06 14:40:49
+ * @Description: 弹球游戏
+ * @FilePath: /leafer-games/src/views/marbles/index.ts
+ */
 import { message } from 'ant-design-vue';
-import LeaferGame from '../../game-core/LeaferGame.ts';
-import { UserGameConfig } from '../../game-core/GameGraph.ts';
+import { Ellipse as LeaferEllipse, Rect as LeaferRect, Star } from 'leafer-ui';
+
+import { UserGameConfig } from '@/game-core/GameGraph';
+import LeaferGame from '@/game-core/LeaferGame';
 
 type MarblesGameConfig = {
   step: number,
@@ -90,9 +99,9 @@ export default class MarblesGame extends LeaferGame<MarblesGameConfig> {
     // 暴力寻找
     const starIndex = this.stars.findIndex((star) => {
       const x1 = star.x! < x && star.x! + star.width! > x;
-      const x2 = star.x! < x + this.ball!.width! && star.x! + star.width! > x + this.ball!.width!;
+      const x2 = star.x! < x + ballSize && star.x! + star.width! > x + ballSize;
       const y1 = star.y! < y && star.y! + star.height! > y;
-      const y2 = star.y! < y + this.ball!.height! && star.y! + star.height! > y + this.ball!.height!;
+      const y2 = star.y! < y + ballSize && star.y! + star.height! > y + ballSize;
       return (x1 && y1) || (x2 && y2) || (x1 && y2) || (x2 && y1);
     });
     if (starIndex > -1) {
@@ -135,7 +144,7 @@ export default class MarblesGame extends LeaferGame<MarblesGameConfig> {
   }
 
   updateScore() {
-    this.score++;
+    this.score += 1;
     this.config.updateScore(this.score);
   }
 
@@ -171,7 +180,9 @@ export default class MarblesGame extends LeaferGame<MarblesGameConfig> {
     this.moveAnimate();
     this.initStarList();
     this.bindDirKeyboardEvent();
-    window.addEventListener('keyup', () => (this.keydown = false));
+    window.addEventListener('keyup', () => {
+      this.keydown = false;
+    });
   }
 
   stop() {

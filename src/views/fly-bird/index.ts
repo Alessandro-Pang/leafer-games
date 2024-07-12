@@ -1,9 +1,18 @@
-import { Rect as LeaferRect, PointerEvent } from 'leafer-ui';
+/*
+ * @Author: zi.yang
+ * @Date: 2024-07-06 11:34:17
+ * @LastEditors: zi.yang
+ * @LastEditTime: 2024-07-06 14:41:28
+ * @Description: 飞翔的小鸟
+ * @FilePath: /leafer-games/src/views/fly-bird/index.ts
+ */
 import { message } from 'ant-design-vue';
-import LeaferGame from '../../game-core/LeaferGame.ts';
-import birdImg from '../../assets/fly-bird/bird.svg';
-import { randomInt } from '../../utils';
-import { UserGameConfig } from '../../game-core/GameGraph.ts';
+import { PointerEvent, Rect as LeaferRect } from 'leafer-ui';
+
+import birdImg from '@/assets/fly-bird/bird.svg';
+import { UserGameConfig } from '@/game-core/GameGraph';
+import LeaferGame from '@/game-core/LeaferGame';
+import { randomInt } from '@/utils';
 
 type MarblesGameConfig = {
   updateScore: (val: number) => void
@@ -35,9 +44,9 @@ export default class FlyBirdGame extends LeaferGame<MarblesGameConfig> {
     // 边界检测
     const height = this.wrapper.height!;
     if (this.bird.y! + this.bird.height! >= height) {
-		  this.bird.y = height - this.bird.height!;
+      this.bird.y = height - this.bird.height!;
     } else if (this.bird.y! <= 0) {
-		  this.bird.y = 0;
+      this.bird.y = 0;
     }
   }
 
@@ -81,7 +90,8 @@ export default class FlyBirdGame extends LeaferGame<MarblesGameConfig> {
 
   moveWall() {
     if (!this.runStatus) return;
-    this.wallList.forEach(([topWall, bottomWall], index) => {
+    this.wallList.forEach((wall, index) => {
+      const [topWall, bottomWall] = wall;
       if (this.check(index)) {
         this.stop();
         return;
@@ -96,8 +106,8 @@ export default class FlyBirdGame extends LeaferGame<MarblesGameConfig> {
 
       // 根据最后一个的位置，新增墙
       if (index === this.wallList.length - 1) {
-        if (topWall.x! < this.wrapper?.width! / 2) {
-          this.drawWall(this.wrapper!.width!);
+        if (topWall.x! < this.wrapper.width! / 2) {
+          this.drawWall(this.wrapper.width!);
         }
       }
 

@@ -1,8 +1,17 @@
-import { Rect as LeaferRect, Star } from 'leafer-ui';
+/*
+ * @Author: zi.yang
+ * @Date: 2024-07-06 11:34:17
+ * @LastEditors: zi.yang
+ * @LastEditTime: 2024-07-06 14:42:00
+ * @Description: 贪吃蛇
+ * @FilePath: /leafer-games/src/views/snake/index.ts
+ */
 import { message } from 'ant-design-vue';
-import LeaferGame from '../../game-core/LeaferGame.ts';
-import { randomInt } from '../../utils';
-import { UserGameConfig } from '../../game-core/GameGraph.ts';
+import { Rect as LeaferRect, Star } from 'leafer-ui';
+
+import { UserGameConfig } from '@/game-core/GameGraph';
+import LeaferGame from '@/game-core/LeaferGame';
+import { randomInt } from '@/utils';
 
 type MarblesGameConfig = {
   updateScore: (val: number) => void
@@ -58,40 +67,40 @@ export default class SnakeGame extends LeaferGame<MarblesGameConfig> {
   }
 
   /**
-	 * 按下向上方向键
-	 */
+   * 按下向上方向键
+   */
   onArrowKeyUp() {
     if (this.to[1]) return;
     this.to = [0, -size];
   }
 
   /**
-	 * 按下向下方向键
-	 */
+   * 按下向下方向键
+   */
   onArrowKeyDown() {
     if (this.to[1]) return;
     this.to = [0, size];
   }
 
   /**
-	 * 按下向左方向键
-	 */
+   * 按下向左方向键
+   */
   onArrowKeyLeft() {
     if (this.to[0]) return;
     this.to = [-size, 0];
   }
 
   /**
-	 * 按下向右方向键
-	 */
+   * 按下向右方向键
+   */
   onArrowKeyRight() {
     if (this.to[0]) return;
     this.to = [size, 0];
   }
 
   /**
-	 * 按下方向键之后
-	 */
+   * 按下方向键之后
+   */
   onArrowKeyAfter() {
     this.moveSnake();
   }
@@ -167,7 +176,7 @@ export default class SnakeGame extends LeaferGame<MarblesGameConfig> {
   }
 
   updateScore() {
-    this.score++;
+    this.score += 1;
     this.config.updateScore(this.score);
   }
 
@@ -189,7 +198,6 @@ export default class SnakeGame extends LeaferGame<MarblesGameConfig> {
   }
 
   paused() {
-
   }
 
   resume() {

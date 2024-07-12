@@ -1,15 +1,29 @@
+<!--
+ * @Author: zi.yang
+ * @Date: 2024-07-06 14:16:02
+ * @LastEditors: zi.yang
+ * @LastEditTime: 2024-07-06 14:41:42
+ * @Description: 首页
+ * @FilePath: /leafer-games/src/views/home/index.vue
+-->
 <script setup lang="ts">
-import {routes} from "../../router";
+import { routes } from '@/router'; // eslint-disable-line
 
-const routesList = routes.filter(item => !item.meta.hidden)
+const routesList = routes.filter((item: any) => !item.meta.hidden);
 </script>
 
 <template>
   <ul class="card-list">
-    <li  class="card-item--box" v-for="(item, idx) of routesList" :key="idx">
+    <li
+      v-for="(item, idx) of routesList"
+      :key="idx"
+      class="card-item--box"
+    >
       <div class="card-item">
         <router-link :to="item.path">
-          <div class="link-name">{{ item.meta.title }}</div>
+          <div class="link-name">
+            {{ item.meta.title }}
+          </div>
         </router-link>
       </div>
     </li>

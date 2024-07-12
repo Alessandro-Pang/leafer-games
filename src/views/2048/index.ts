@@ -1,9 +1,17 @@
-import { Box, Text } from 'leafer-ui';
-import { IUI } from '@leafer-ui/interface';
+/*
+ * @Author: zi.yang
+ * @Date: 2024-07-06 11:34:17
+ * @LastEditors: zi.yang
+ * @LastEditTime: 2024-07-06 14:41:15
+ * @Description: 2048
+ * @FilePath: /leafer-games/src/views/2048/index.ts
+ */
 import { message } from 'ant-design-vue';
-import LeaferGame from '../../game-core/LeaferGame.ts';
-import { randomInt } from '../../utils';
-import { UserGameConfig } from '../../game-core/GameGraph.ts';
+import { Box, Text } from 'leafer-ui';
+import type { IUI } from '@leafer-ui/interface';
+import { UserGameConfig } from '@/game-core/GameGraph';
+import LeaferGame from '@/game-core/LeaferGame';
+import { randomInt } from '@/utils';
 
 type MarblesGameConfig = {
   updateScore: (val: number) => void
@@ -38,10 +46,11 @@ export default class Play2048Game extends LeaferGame<MarblesGameConfig> {
   }
 
   computed(value: number) {
+    let val = value;
     let n = 0;
-    while (value > 1) {
-      value /= 2;
-      n++;
+    while (val > 1) {
+      val /= 2;
+      n += 1;
     }
     return n;
   }
@@ -128,45 +137,45 @@ export default class Play2048Game extends LeaferGame<MarblesGameConfig> {
   }
 
   /**
-	 * 数字方块移动逻辑
-	 * @param axis x轴 还是 y轴 移动
-	 * @param computed 计算当前方块移动位置
-	 */
+   * 数字方块移动逻辑
+   * @param axis x轴 还是 y轴 移动
+   * @param computed 计算当前方块移动位置
+   */
   moveBlock(axis: 'x' | 'y', computed: (index: number, block: IUI) => number) {
-    for (const block of this.blockList) {
+    for (let idx = 0; idx < this.blockList.length; idx++) {
+      const block = this.blockList[idx];
       let [i, position, lastIdx] = [0, 0, -1];
       block.data!.cacheValue = block.data!.value;
       block.data!.isAdd = false;
 
-      while (true) {
-			  position = computed(i, block);
-			  // 寻找同向是否方块
-			  const index = this.alreadyMoved.findIndex((node) => {
-			    const another = axis === 'x' ? 'y' : 'x';
-			    return node[axis] === position && node[another] === block[another];
-			  });
-			  if (index === -1) break;
-			  lastIdx = index;
-			  i++;
+      for (;;) {
+        position = computed(i, block);
+        // 寻找同向是否方块
+        const index = this.alreadyMoved.findIndex((node) => {
+          const another = axis === 'x' ? 'y' : 'x';
+          return node[axis] === position && node[another] === block[another];
+        });
+        if (index === -1) break;
+        lastIdx = index;
+        i += 1;
       }
 
       if (block[axis]! !== position) {
-			  this.hasMove = true;
+        this.hasMove = true;
       }
 
       // 判断相邻方块是否是相同数字
       if (lastIdx > -1 && !this.alreadyMoved[lastIdx].data!.isAdd) {
-			  const preBlock = this.alreadyMoved[lastIdx];
-			  const value = preBlock.data!.cacheValue;
+        const preBlock = this.alreadyMoved[lastIdx];
+        const value = preBlock.data!.cacheValue;
 
-			  if (value === block.data!.value) {
-			    block.remove();
-			    this.hasMove = true;
-			    this.updateBlock(preBlock);
-			    continue;
-			  }
+        if (value === block.data!.value) {
+          block.remove();
+          this.hasMove = true;
+          this.updateBlock(preBlock);
+          continue;
+        }
       }
-
       block[axis] = position;
       this.alreadyMoved.push(block);
     }
@@ -260,6 +269,7 @@ export default class Play2048Game extends LeaferGame<MarblesGameConfig> {
 
   stop() {
     this.wrapper!.off();
+    this.removeDirKeyboardEvent();
     message.warn(`游戏结束, 最终得分：${this.score}`);
   }
 

@@ -1,8 +1,18 @@
-import { DropEvent, Rect as LeaferRect, DragEvent } from 'leafer-ui';
-import type { IUI } from '@leafer-ui/interface';
+/*
+ * @Author: zi.yang
+ * @Date: 2024-07-06 11:34:17
+ * @LastEditors: zi.yang
+ * @LastEditTime: 2024-07-06 14:41:52
+ * @Description: 拼图
+ * @FilePath: /leafer-games/src/views/puzzle/index.ts
+ */
 import { message } from 'ant-design-vue';
-import LeaferGame from '../../game-core/LeaferGame.ts';
-import { UserGameConfig } from '../../game-core/GameGraph.ts';
+import { DragEvent, DropEvent, Rect as LeaferRect } from 'leafer-ui';
+
+import type { IUI } from '@leafer-ui/interface';
+
+import { UserGameConfig } from '@/game-core/GameGraph';
+import LeaferGame from '@/game-core/LeaferGame';
 
 type PuzzleGameOption = {
   count: number,
@@ -28,10 +38,10 @@ export default class PuzzleGame extends LeaferGame<PuzzleGameOption> {
   }
 
   /**
-	 * 创建图片节点
-	 * @param idx
-	 * @param count
-	 */
+   * 创建图片节点
+   * @param idx
+   * @param count
+   */
   createImage(idx: number, count: number) {
     const width = this.wrapper.width! / count;
     const height = this.wrapper.height! / count;
@@ -57,12 +67,12 @@ export default class PuzzleGame extends LeaferGame<PuzzleGameOption> {
   }
 
   /**
-	 * 打乱拼图排序
-	 */
+   * 打乱拼图排序
+   */
   shuffleImages() {
     if (!this.wrapper) return;
     const imagePos = this.images.map((item) => ({ x: item.x, y: item.y }));
-    this.wrapper.children.sort(() => (Math.random() > Math.random() ? -1 : 1));
+    this.wrapper.children.sort(() => (Math.random() > 0.5 ? -1 : 1));
     this.wrapper.children.forEach((node: IUI, idx) => {
       node.set(imagePos[idx]);
       node.data!.current = idx;
@@ -72,9 +82,9 @@ export default class PuzzleGame extends LeaferGame<PuzzleGameOption> {
   }
 
   /**
-	 * 绑定图片移动事件
-	 * @param image
-	 */
+   * 绑定图片移动事件
+   * @param image
+   */
   bindMoveImageEvent(image: LeaferRect) {
     let dragNode: LeaferRect | null = null;
     let [x, y] = [0, 0];
@@ -97,28 +107,28 @@ export default class PuzzleGame extends LeaferGame<PuzzleGameOption> {
 
     image.on(DropEvent.DROP, (evt) => {
       const node = evt.target;
-      const { x, y, dragNode } = evt.data || {};
-
-      if (!node || !dragNode) return;
+      const onDragNode = evt.data.dragNode;
+      if (!node || !onDragNode) return;
+      const size = onDragNode.width;
       // 校验是否斜角移动
-      if (node.x !== dragNode.x && node.y !== dragNode.y) return;
+      if (node.x !== onDragNode.x && node.y !== onDragNode.y) return;
       // 校验 x 移动格数
-      if (node.x >= dragNode.x + (dragNode.width * 2) || node.x < dragNode.x - dragNode.width) {
+      if (node.x >= onDragNode.x + (size * 2) || node.x < onDragNode.x - size) {
         return;
       }
       // 校验 y 移动格数
-      if (node.y >= dragNode.y + (dragNode.height * 2) || node.y < dragNode.y - dragNode.height) {
+      if (node.y >= onDragNode.y + (size * 2) || node.y < onDragNode.y - size) {
         return;
       }
       // 交换 current 值
       const targetIdx = node.data.current;
-      const dragNodeIdx = dragNode.data.current;
-      dragNode.data.current = targetIdx;
+      const dragNodeIdx = onDragNode.data.current;
+      onDragNode.data.current = targetIdx;
       node.data.current = dragNodeIdx;
 
       // 交换节点位置
-      dragNode.set({ x: node.x, y: node.y });
-      node.set({ x, y });
+      onDragNode.set({ x: node.x, y: node.y });
+      node.set({ x: evt.data.x, y: evt.data.y });
       // 检查是否成功
       if (this.isCompleted()) {
         message.success('恭喜你，完成拼图');
@@ -131,8 +141,8 @@ export default class PuzzleGame extends LeaferGame<PuzzleGameOption> {
   }
 
   /**
-	 * 检查排序
-	 */
+   * 检查排序
+   */
   isCompleted() {
     return this.images.every((item) => item.data!.current === item.data!.sortId);
   }
@@ -141,20 +151,18 @@ export default class PuzzleGame extends LeaferGame<PuzzleGameOption> {
   }
 
   stop() {
-
   }
 
   paused() {
-
   }
 
   resume() {
   }
 
   /**
-	 * 重置游戏
-	 * @param gameConfig
-	 */
+   * 重置游戏
+   * @param gameConfig
+   */
   resetGame(gameConfig: UserGameConfig<PuzzleGameOption>) {
     this.images = [];
     this.config = gameConfig;

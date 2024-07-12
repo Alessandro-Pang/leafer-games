@@ -1,31 +1,39 @@
+<!--
+ * @Author: zi.yang
+ * @Date: 2024-07-06 14:16:02
+ * @LastEditors: zi.yang
+ * @LastEditTime: 2024-07-06 14:41:25
+ * @Description: 2048
+ * @FilePath: /leafer-games/src/views/2048/index.vue
+-->
 <script setup lang="ts">
-import {nextTick, ref} from "vue";
-import Play2048Game from "./index.ts";
-import {Button as AButton} from "ant-design-vue";
+import { nextTick, ref } from 'vue';
+import { Button as AButton } from 'ant-design-vue';
+import Play2048Game from '.';
 
-let play2048Game: Play2048Game | null = null
+let play2048Game: Play2048Game | null = null;
 
 const isFirstStart = ref(true);
-const score = ref(0)
+const score = ref(0);
 
 function resetGame() {
   play2048Game = new Play2048Game('game-wrapper', {
     borderWidth: 10,
     updateScore: (val) => {
-      score.value = val
-    }
-  })
+      score.value = val;
+    },
+  });
 }
 
-nextTick(() => resetGame())
+nextTick(() => resetGame());
 
 function startGame() {
   isFirstStart.value = false;
-  play2048Game?.start()
+  play2048Game?.start();
 }
 
 function restartGame() {
-  play2048Game?.restart()
+  play2048Game?.restart();
 }
 </script>
 
@@ -33,15 +41,21 @@ function restartGame() {
   <div class="score-board">
     <div class="board">
       <span>分数：</span>
-      <span class="score">{{ score }}</span>
+      <span class="score">
+        {{ score }}
+      </span>
     </div>
   </div>
   <div class="main">
     <div id="game-wrapper" style="width: 100%; height: 100%"></div>
   </div>
   <div style="text-align: center; margin: 20px 0">
-    <a-button type="primary" @click="startGame" v-if="isFirstStart">开始游戏</a-button>
-    <a-button type="primary" @click="restartGame" v-else>重新开始</a-button>
+    <a-button v-if="isFirstStart" type="primary" @click="startGame">
+      开始游戏
+    </a-button>
+    <a-button v-else type="primary" @click="restartGame">
+      重新开始
+    </a-button>
   </div>
 </template>
 

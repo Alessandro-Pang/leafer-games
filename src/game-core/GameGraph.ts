@@ -106,9 +106,9 @@ export default abstract class GameGraph<T> {
   }
 
   /**
-	 * 初始化游戏盒子元素
-	 * @private
-	 */
+   * 初始化游戏盒子元素
+   * @private
+   */
   private initGameBox() {
     const gameBox = document.createElement('div');
     gameBox.style.width = '100%';
@@ -119,8 +119,8 @@ export default abstract class GameGraph<T> {
   }
 
   /**
-	 * 获取外层包围盒大小
-	 */
+   * 获取外层包围盒大小
+   */
   get getBBoxSize() {
     const { size } = this.userGameConfig;
     // 获取容器宽高
@@ -145,9 +145,9 @@ export default abstract class GameGraph<T> {
   }
 
   /**
-	 * 初始化游戏配置
-	 * @private
-	 */
+   * 初始化游戏配置
+   * @private
+   */
   private initConfig() {
     const ugc = this.userGameConfig;
     const [width, height] = this.getBBoxSize;
@@ -167,9 +167,9 @@ export default abstract class GameGraph<T> {
   }
 
   /**
-	 * 初始化 app
-	 * @private
-	 */
+   * 初始化 app
+   * @private
+   */
   private initGameApp() {
     if (!this.gameBox) {
       throw new Error('App 实例初始化失败，gameBox 生成失败！');
@@ -188,9 +188,9 @@ export default abstract class GameGraph<T> {
   }
 
   /**
-	 * 初始化游戏包装器
-	 * @private
-	 */
+   * 初始化游戏包装器
+   * @private
+   */
   private initGameWrapper() {
     const {
       size, x, y, borderWidth: bw,
@@ -220,9 +220,9 @@ export default abstract class GameGraph<T> {
   }
 
   /**
-	 * 获取计算属性
-	 * @param prop
-	 */
+   * 获取计算属性
+   * @param prop
+   */
   getComputedStyle(prop: string): number;
   getComputedStyle(prop: string[]): number[];
   getComputedStyle(prop: string | string[]): number | number[] {
@@ -231,32 +231,32 @@ export default abstract class GameGraph<T> {
     const style = window.getComputedStyle(viewDom);
     if (typeof prop === 'string') {
       const val = style[prop as keyof CSSStyleDeclaration];
-      return typeof val === 'string' ? Number.parseInt(val.replace(/px/, '')) : 0;
+      return typeof val === 'string' ? Number.parseInt(val.replace(/px/, ''), 10) : 0;
     }
     if (Array.isArray(prop)) {
       return prop.map((key) => {
         const val = style[key as keyof CSSStyleDeclaration];
-        return typeof val === 'string' ? Number.parseInt(val.replace(/px/, '')) : 0;
+        return typeof val === 'string' ? Number.parseInt(val.replace(/px/, ''), 10) : 0;
       });
     }
     return 0;
   }
 
   /**
-	 * 初始化游戏地图（环境）
-	 */
+   * 初始化游戏地图（环境）
+   */
   abstract initGameMap(): void;
 
   restart() {
-	  // 销毁画布
-	  this.app.clear();
-	  this.app.remove();
-	  const gameBoxWrapper = document.getElementById(this.view);
-	  gameBoxWrapper?.removeChild(gameBoxWrapper?.children[0]);
-	  // 初始化游戏
-	  this.initGameBox();
-	  this.initGameApp();
-	  this.initGameWrapper();
-	  this.initGameMap();
+    // 销毁画布
+    this.app.clear();
+    this.app.remove();
+    const gameBoxWrapper = document.getElementById(this.view);
+    gameBoxWrapper?.removeChild(gameBoxWrapper?.children[0]);
+    // 初始化游戏
+    this.initGameBox();
+    this.initGameApp();
+    this.initGameWrapper();
+    this.initGameMap();
   }
 }
