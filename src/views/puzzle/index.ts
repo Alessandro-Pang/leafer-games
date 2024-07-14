@@ -73,7 +73,8 @@ export default class PuzzleGame extends LeaferGame<PuzzleGameOption> {
     if (!this.wrapper) return;
     const imagePos = this.images.map((item) => ({ x: item.x, y: item.y }));
     this.wrapper.children.sort(() => (Math.random() > 0.5 ? -1 : 1));
-    this.wrapper.children.forEach((node: IUI, idx) => {
+    this.wrapper.children.forEach((item: IUI, idx) => {
+      const node = item;
       node.set(imagePos[idx]);
       node.data!.current = idx;
       this.bindMoveImageEvent(node as LeaferRect);
@@ -133,8 +134,9 @@ export default class PuzzleGame extends LeaferGame<PuzzleGameOption> {
       if (this.isCompleted()) {
         message.success('恭喜你，完成拼图');
         this.images.forEach((item) => {
-          item.draggable = false;
-          item.off();
+          const img = item;
+          img.draggable = false;
+          img.off();
         });
       }
     });

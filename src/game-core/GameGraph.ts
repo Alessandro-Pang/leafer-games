@@ -1,6 +1,5 @@
 import { App, Box } from 'leafer-ui';
-import { isNil } from '../utils';
-
+import { isNil } from '@/utils';
 /**
  * 基础画布大小配置
  */

@@ -142,8 +142,7 @@ export default class Play2048Game extends LeaferGame<MarblesGameConfig> {
    * @param computed 计算当前方块移动位置
    */
   moveBlock(axis: 'x' | 'y', computed: (index: number, block: IUI) => number) {
-    for (let idx = 0; idx < this.blockList.length; idx++) {
-      const block = this.blockList[idx];
+    for (const block of this.blockList) { // eslint-disable-line
       let [i, position, lastIdx] = [0, 0, -1];
       block.data!.cacheValue = block.data!.value;
       block.data!.isAdd = false;
@@ -151,7 +150,7 @@ export default class Play2048Game extends LeaferGame<MarblesGameConfig> {
       for (;;) {
         position = computed(i, block);
         // 寻找同向是否方块
-        const index = this.alreadyMoved.findIndex((node) => {
+        const index = this.alreadyMoved.findIndex((node) => { // eslint-disable-line
           const another = axis === 'x' ? 'y' : 'x';
           return node[axis] === position && node[another] === block[another];
         });

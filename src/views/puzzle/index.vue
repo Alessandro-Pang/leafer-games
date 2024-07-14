@@ -19,7 +19,7 @@ import {
 } from 'ant-design-vue';
 import { UndoOutlined } from '@ant-design/icons-vue';
 import PuzzleGame from '.';
-import { PlatformSizeConfig } from '@/game-core/GameGraph';
+import type { PlatformSizeConfig } from '@/game-core/GameGraph';
 
 const count = ref(4);
 const img = ref('');
@@ -94,7 +94,11 @@ nextTick(() => initGame());
   </a-row>
   <div style="text-align: center; margin: 20px 0">
     对局难度：
-    <a-select v-model:value="count" style="width: 160px; margin-bottom: 10px" @change="changeDifficulty">
+    <a-select
+      v-model:value="count"
+      style="width: 160px; margin-bottom: 10px"
+      @change="changeDifficulty"
+    >
       <a-select-option v-for="idx of 6" :key="idx" :value="idx + 3">
         {{ `${idx + 3} x ${idx + 3}` }}
       </a-select-option>

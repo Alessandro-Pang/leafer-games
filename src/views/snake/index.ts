@@ -22,7 +22,7 @@ const size = 10;
 export default class SnakeGame extends LeaferGame<MarblesGameConfig> {
   private snake: LeaferRect[] = [];
 
-  private timer: number | null = null;
+  private timer: number = 0;
 
   private star: Star | null = null;
 
@@ -181,18 +181,18 @@ export default class SnakeGame extends LeaferGame<MarblesGameConfig> {
   }
 
   start() {
-    clearInterval(this.timer!);
+    clearInterval(this.timer);
     this.createStar();
     this.bindDirKeyboardEvent();
-    this.timer = setInterval(() => {
+    this.timer = window.setInterval(() => {
       this.moveSnake();
     }, 200);
   }
 
   stop() {
     if (!this.timer) return;
-    clearInterval(this.timer!);
-    this.timer = null;
+    clearInterval(this.timer);
+    this.timer = 0;
     message.warn(`游戏结束, 最终得分：${this.score}`);
     this.removeDirKeyboardEvent();
   }
@@ -212,7 +212,7 @@ export default class SnakeGame extends LeaferGame<MarblesGameConfig> {
     this.config.updateScore(0);
     this.snake = [];
     this.to = [size, 0];
-    clearInterval(this.timer!);
+    clearInterval(this.timer);
     this.removeDirKeyboardEvent();
     super.restart();
     this.start();
