@@ -129,16 +129,16 @@ export default class MarblesGame extends LeaferGame<MarblesGameConfig> {
     this.stars.push(star);
   }
 
-  onArrowKeyBefore() {
+  async onArrowKeyBefore() {
     this.keydown = true;
   }
 
-  onArrowKeyLeft() {
+  async onArrowKeyLeft() {
     this.keydown = true;
     this.boardMove = -4;
   }
 
-  onArrowKeyRight() {
+  async onArrowKeyRight() {
     this.keydown = true;
     this.boardMove = 4;
   }

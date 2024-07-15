@@ -69,7 +69,7 @@ export default class SnakeGame extends LeaferGame<MarblesGameConfig> {
   /**
    * 按下向上方向键
    */
-  onArrowKeyUp() {
+  async onArrowKeyUp() {
     if (this.to[1]) return;
     this.to = [0, -size];
   }
@@ -77,7 +77,7 @@ export default class SnakeGame extends LeaferGame<MarblesGameConfig> {
   /**
    * 按下向下方向键
    */
-  onArrowKeyDown() {
+  async onArrowKeyDown() {
     if (this.to[1]) return;
     this.to = [0, size];
   }
@@ -85,7 +85,7 @@ export default class SnakeGame extends LeaferGame<MarblesGameConfig> {
   /**
    * 按下向左方向键
    */
-  onArrowKeyLeft() {
+  async onArrowKeyLeft() {
     if (this.to[0]) return;
     this.to = [-size, 0];
   }
@@ -93,7 +93,7 @@ export default class SnakeGame extends LeaferGame<MarblesGameConfig> {
   /**
    * 按下向右方向键
    */
-  onArrowKeyRight() {
+  async onArrowKeyRight() {
     if (this.to[0]) return;
     this.to = [size, 0];
   }
@@ -101,7 +101,7 @@ export default class SnakeGame extends LeaferGame<MarblesGameConfig> {
   /**
    * 按下方向键之后
    */
-  onArrowKeyAfter() {
+  async onArrowKeyAfter() {
     this.moveSnake();
   }
 
