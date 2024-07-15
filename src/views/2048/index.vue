@@ -19,6 +19,9 @@ const score = ref(0);
 function resetGame() {
   play2048Game = new Play2048Game('game-wrapper', {
     borderWidth: 10,
+    size: {
+      mobile: [window.innerWidth, window.innerWidth],
+    },
     updateScore: (val) => {
       score.value = val;
     },

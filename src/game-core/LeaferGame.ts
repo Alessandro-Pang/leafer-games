@@ -31,66 +31,72 @@ export default abstract class LeaferGame<T> extends GameGraph<T> {
 * 绑定方向键按下事件
 * @param event
 */
-  directionKeyboardAction(event: KeyboardEvent) {
-    this.onArrowKeyBefore();
+  async directionKeyboardAction(event: KeyboardEvent) {
+    await this.onArrowKeyBefore();
     /* eslint-disable indent */
     switch (event.code) {
       case 'KeyW':
       case 'ArrowUp':
-        this.onArrowKeyUp();
+        await this.onArrowKeyUp();
         break;
       case 'KeyS':
       case 'ArrowDown':
-        this.onArrowKeyDown();
+        await this.onArrowKeyDown();
         break;
       case 'KeyA':
       case 'ArrowLeft':
-        this.onArrowKeyLeft();
+        await this.onArrowKeyLeft();
         break;
       case 'KeyD':
       case 'ArrowRight':
-        this.onArrowKeyRight();
+        await this.onArrowKeyRight();
         break;
       default: break;
     }
     /* eslint-enable */
-    this.onArrowKeyAfter();
+    await this.onArrowKeyAfter();
   }
 
   /**
 * 按下方向键之前
 */
-  onArrowKeyBefore() {
+  async onArrowKeyBefore() {
+    // overrides method
   }
 
   /**
 * 按下向上方向键
 */
-  onArrowKeyUp() {
+  async onArrowKeyUp() {
+    // overrides method
   }
 
   /**
 * 按下向下方向键
 */
-  onArrowKeyDown() {
+  async onArrowKeyDown() {
+    // overrides method
   }
 
   /**
 * 按下向左方向键
 */
-  onArrowKeyLeft() {
+  async onArrowKeyLeft() {
+    // overrides method
   }
 
   /**
 * 按下向右方向键
 */
-  onArrowKeyRight() {
+  async onArrowKeyRight() {
+    // overrides method
   }
 
   /**
 * 按下方向键之后
 */
-  onArrowKeyAfter() {
+  async onArrowKeyAfter() {
+    // overrides method
   }
 
   /**
@@ -106,26 +112,26 @@ export default abstract class LeaferGame<T> extends GameGraph<T> {
     });
 
     // 鼠标、手指移动
-    this.wrapper.on(PointerEvent.MOVE, (evt) => {
+    this.wrapper.on(PointerEvent.MOVE, async (evt) => {
       if (!isTapDown) return;
       // 只有拖拽移动距离大于 60 时，才进行移动
       const isSlideX = Math.abs(evt.x - tapDownPos.x) > 60;
       const isSlideY = Math.abs(evt.y - tapDownPos.y) > 60;
       if (!isSlideY && !isSlideX) return;
       isTapDown = false;
-      this.onTapSlideBefore();
+      await this.onTapSlideBefore();
       if (isSlideX) {
         if (evt.x - tapDownPos.x > 0) {
-          this.onTapSlideToRight();
+          await this.onTapSlideToRight();
         } else {
-          this.onTapSlideToLeft();
+          await this.onTapSlideToLeft();
         }
       } else if (evt.y - tapDownPos.y > 0) {
-        this.onTapSlideToDown();
+        await this.onTapSlideToDown();
       } else {
-        this.onTapSlideToUp();
+        await this.onTapSlideToUp();
       }
-      this.onTapSlideAfter();
+      await this.onTapSlideAfter();
     });
 
     // 鼠标、手指抬起
@@ -138,37 +144,43 @@ export default abstract class LeaferGame<T> extends GameGraph<T> {
   /**
 * 手指、鼠标拖动之前
 */
-  onTapSlideBefore() {
+  async onTapSlideBefore() {
+    // overrides method
   }
 
   /**
 * 手指、鼠标向右拖动
 */
-  onTapSlideToRight() {
+  async onTapSlideToRight() {
+    // overrides method
   }
 
   /**
 * 手指、鼠标向左拖动
 */
-  onTapSlideToLeft() {
+  async onTapSlideToLeft() {
+    // overrides method
   }
 
   /**
 * 手指、鼠标向上拖动
 */
-  onTapSlideToUp() {
+  async onTapSlideToUp() {
+    // overrides method
   }
 
   /**
 * 手指、鼠标向下拖动
 */
-  onTapSlideToDown() {
+  async onTapSlideToDown() {
+    // overrides method
   }
 
   /**
 * 手指、鼠标拖动之后
 */
-  onTapSlideAfter() {
+  async onTapSlideAfter() {
+    // overrides method
   }
 
   /**
@@ -199,7 +211,8 @@ export default abstract class LeaferGame<T> extends GameGraph<T> {
   }
 
   async getGameState(key: string) {
-    await this.storage.get(key);
+    const res = await this.storage.get(key);
+    return res;
   }
 
   async removeGameState(key: string) {

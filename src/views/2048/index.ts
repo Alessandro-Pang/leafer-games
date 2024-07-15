@@ -7,7 +7,7 @@
  * @FilePath: /leafer-games/src/views/2048/index.ts
  */
 import { message } from 'ant-design-vue';
-import { Box, Text } from 'leafer-ui';
+import { Box, Text, UI } from 'leafer-ui';
 import type { IUI } from '@leafer-ui/interface';
 import { UserGameConfig } from '@/game-core/GameGraph';
 import LeaferGame from '@/game-core/LeaferGame';
@@ -18,6 +18,8 @@ type MarblesGameConfig = {
 };
 
 const colorList = ['#eee4da', '#ede0c8', '#f2b179', '#f59563', '#f67c5f', '#f65e3b', '#edcf72', '#edcc61', '#edc850', '#edc53f', '#edc22e'];
+
+const gameName = 'play2048Game';
 
 export default class Play2048Game extends LeaferGame<MarblesGameConfig> {
   private score: number = 0;
@@ -180,32 +182,36 @@ export default class Play2048Game extends LeaferGame<MarblesGameConfig> {
     }
   }
 
-  onTapSlideBefore() {
+  async onTapSlideBefore() {
     this.hasMove = false;
   }
 
-  onTapSlideToRight() {
+  async onTapSlideToRight() {
     this.wrapper!.children.sort((a, b) => b.x! - a.x!);
     this.moveBlock('x', (i, block) => this.wrapper!.width! - ((i + 1) * block.width! + (i + 1) * 5 + i * 5));
   }
 
-  onTapSlideToLeft() {
+  async onTapSlideToLeft() {
     this.wrapper!.children.sort((a, b) => a.x! - b.x!);
     this.moveBlock('x', (i, block) => i * block.width! + i * 5 + (i + 1) * 5);
   }
 
-  onTapSlideToUp() {
+  async onTapSlideToUp() {
     this.wrapper!.children.sort((a, b) => a.y! - b.y!);
     this.moveBlock('y', (i, block) => i * block.height! + i * 5 + (i + 1) * 5);
   }
 
-  onTapSlideToDown() {
+  async onTapSlideToDown() {
     this.wrapper!.children.sort((a, b) => b.y! - a.y!);
     this.moveBlock('y', (i, block) => this.wrapper!.height! - ((i + 1) * block.height! + (i + 1) * 5 + i * 5));
   }
 
-  onTapSlideAfter() {
+  async onTapSlideAfter() {
     if (this.hasMove) {
+      await this.setGameState(gameName, {
+        score: this.score,
+        node: this.wrapper.toJSON(),
+      });
       this.addNumberBlock();
     }
     this.alreadyMoved = [];
@@ -214,28 +220,28 @@ export default class Play2048Game extends LeaferGame<MarblesGameConfig> {
     }
   }
 
-  onArrowKeyBefore() {
-    this.onTapSlideBefore();
+  async onArrowKeyBefore() {
+    await this.onTapSlideBefore();
   }
 
-  onArrowKeyUp() {
-    this.onTapSlideToUp();
+  async onArrowKeyUp() {
+    await this.onTapSlideToUp();
   }
 
-  onArrowKeyDown() {
-    this.onTapSlideToDown();
+  async onArrowKeyDown() {
+    await this.onTapSlideToDown();
   }
 
-  onArrowKeyLeft() {
-    this.onTapSlideToLeft();
+  async onArrowKeyLeft() {
+    await this.onTapSlideToLeft();
   }
 
-  onArrowKeyRight() {
-    this.onTapSlideToRight();
+  async onArrowKeyRight() {
+    await this.onTapSlideToRight();
   }
 
-  onArrowKeyAfter() {
-    this.onTapSlideAfter();
+  async onArrowKeyAfter() {
+    await this.onTapSlideAfter();
   }
 
   checkGameOver() {
@@ -269,30 +275,40 @@ export default class Play2048Game extends LeaferGame<MarblesGameConfig> {
   stop() {
     this.wrapper!.off();
     this.removeDirKeyboardEvent();
+    this.removeGameState(gameName);
     message.warn(`游戏结束, 最终得分：${this.score}`);
   }
 
   paused() {
-
   }
 
   resume() {
   }
 
-  initGameMap() {
+  async initGameMap() {
+    const state = await this.getGameState(gameName);
     this.bbox.set({
       fill: '#bbada0',
       cornerRadius: 8,
       stroke: '#bbada0',
     });
-    this.drawGrid();
-    this.addNumberBlock();
-    this.addNumberBlock();
+    if (state) {
+      this.score = state.score;
+      this.config.updateScore(this.score);
+      this.wrapper.remove();
+      this.wrapper = UI.one(state.node) as Box;
+      this.bbox.add(this.wrapper);
+    } else {
+      this.drawGrid();
+      this.addNumberBlock();
+      this.addNumberBlock();
+    }
   }
 
   restart() {
     this.score = 0;
     this.config.updateScore(0);
+    this.removeGameState(gameName);
     super.restart();
     this.start();
   }
