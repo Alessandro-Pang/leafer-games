@@ -8,13 +8,27 @@
 -->
 <script setup lang="ts">
 import { nextTick, ref } from 'vue';
-import { Button as AButton } from 'ant-design-vue';
+
+import GameContainer from '@/components/GameContainer.vue';
+
 import MarblesGame from '.';
 
 let marblesGame: MarblesGame | null = null;
 
 const isFirstStart = ref(true);
 const score = ref(0);
+
+// 游戏标题
+const gameTitle = '弹球游戏';
+
+// 游戏操作说明
+const gameInstructions = [
+  '游戏目标：控制底部的挡板接住小球，击打星星获得分数。',
+  '操作方法：使用键盘的左右方向键或A、D键控制挡板移动。',
+  '游戏规则：小球碰到底部边界且没有被挡板接住时，游戏结束。',
+  '得分规则：每击中一个星星得1分。',
+  '提示：观察小球的运动轨迹，提前移动挡板到合适位置。',
+];
 
 function resetGame() {
   marblesGame = new MarblesGame('game-wrapper', {
@@ -39,55 +53,16 @@ function restartGame() {
 </script>
 
 <template>
-  <div class="score-board">
-    <div class="board">
-      <span>分数：</span>
-      <span class="score">
-        {{ score }}
-      </span>
-    </div>
-  </div>
-  <div class="main">
-    <div id="game-wrapper" style="width: 100%; height: 100%"></div>
-  </div>
-  <div style="text-align: center; margin: 20px 0">
-    <a-button v-if="isFirstStart" type="primary" @click="startGame">
-      开始游戏
-    </a-button>
-    <a-button v-else type="primary" @click="restartGame">
-      重新开始
-    </a-button>
-  </div>
+  <GameContainer
+    :title="gameTitle"
+    :instructions="gameInstructions"
+    :score="score"
+    :is-first-start="isFirstStart"
+    @start="startGame"
+    @restart="restartGame"
+  />
 </template>
 
 <style scoped>
-.main {
-  display: flex;
-  text-align: center;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 500px;
-}
-
-.score-board {
-  display: flex;
-  justify-content: center;
-}
-
-.score-board > .board {
-  height: 60px;
-  width: 120px;
-  text-align: center;
-  line-height: 60px;
-  background: #03d5fa;
-  color: yellow;
-  margin-top: 20px;
-  border-radius: 8px;
-  box-shadow: 4px 4px 6px 0 rgba(0,0,0,.2);
-}
-.score-board > .board > .score {
-  font-size: 24px;
-  font-weight: 600;
-}
+/* 游戏特定样式可以在这里添加 */
 </style>

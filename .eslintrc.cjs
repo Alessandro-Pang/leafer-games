@@ -1,3 +1,11 @@
+/*
+ * @Author: zi.yang
+ * @Date: 2024-07-14 21:46:47
+ * @LastEditors: zi.yang
+ * @LastEditTime: 2025-06-04 01:24:23
+ * @Description: 
+ * @FilePath: /leafer-games/.eslintrc.cjs
+ */
 module.exports = {
 	env: {
 		browser: true,
@@ -21,9 +29,19 @@ module.exports = {
 		"vue",
 		"@typescript-eslint"
 	],
+	settings: {
+		'import/resolver': {
+			alias: {
+				map: [
+					['@', './src']
+				],
+				extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue']
+			}
+		}
+	},
 	rules: {
 		"linebreak-style": ["error", "unix"],
-		'no-plusplus': ['error', {allowForLoopAfterthoughts: true}],
+		'no-plusplus': ['error', { allowForLoopAfterthoughts: true }],
 		'class-methods-use-this': 'off',
 		'no-continue': 'off',
 		'import/extensions': [
@@ -31,10 +49,10 @@ module.exports = {
 			'always',
 			{ js: 'never', jsx: 'never', ts: 'never', tsx: 'never' },
 		],
-		"import/no-extraneous-dependencies":[
+		"import/no-extraneous-dependencies": [
 			"error",
 			{
-				"devDependencies":["vite.config.ts"]
+				"devDependencies": ["vite.config.ts"]
 			}
 		],
 		indent: ["error", 2],
@@ -56,8 +74,8 @@ module.exports = {
 		'vue/max-attributes-per-line': [
 			'error',
 			{
-				singleline: {max: 10},
-				multiline: {max: 1},
+				singleline: { max: 10 },
+				multiline: { max: 1 },
 			},
 		],
 		'vue/html-indent': [
@@ -79,5 +97,9 @@ module.exports = {
 				ignores: ['button', 'a', 'p'],
 			},
 		],
+		"vue/singleline-html-element-content-newline": ["error", {
+			"ignoreWhenNoAttributes": true,
+			"ignoreWhenEmpty": true,
+		}]
 	},
 }
