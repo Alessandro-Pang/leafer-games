@@ -2,7 +2,7 @@
  * @Author: zi.yang
  * @Date: 2024-07-06 14:16:02
  * @LastEditors: zi.yang
- * @LastEditTime: 2025-06-04 01:45:35
+ * @LastEditTime: 2025-06-04 01:49:14
  * @Description: 首页
  * @FilePath: /leafer-games/src/views/home/index.vue
 -->
@@ -126,7 +126,7 @@ const resetActiveCard = () => {
             <div class="card-content">
               <div class="card-icon">
                 <img
-                  :src="getImageUrl(route.meta.icon)"
+                  :src="getImageUrl(route.meta.icon as string)"
                   :alt="route.meta.title"
                 />
               </div>
