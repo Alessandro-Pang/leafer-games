@@ -8,13 +8,27 @@
 -->
 <script setup lang="ts">
 import { nextTick, ref } from 'vue';
-import { Button as AButton } from 'ant-design-vue';
+
+import GameContainer from '@/components/GameContainer.vue';
+
 import SnakeGame from '.';
 
 let snakeGame: SnakeGame | null = null;
 
 const isFirstStart = ref(true);
 const score = ref(0);
+
+// 游戏标题
+const gameTitle = '贪吃蛇';
+
+// 游戏操作说明
+const gameInstructions = [
+  '游戏目标：控制蛇吃掉食物，让蛇变得越来越长。',
+  '操作方法：使用键盘的上下左右方向键或W、A、S、D键控制蛇的移动方向。',
+  '游戏规则：蛇碰到自己的身体或游戏边界时，游戏结束。',
+  '得分规则：每吃掉一个食物得1分。',
+  '提示：随着蛇的长度增加，游戏难度会逐渐提高，需要更加谨慎地规划移动路径。',
+];
 
 function resetGame() {
   snakeGame = new SnakeGame('game-wrapper', {
@@ -37,59 +51,16 @@ function restartGame() {
 </script>
 
 <template>
-  <div class="score-board">
-    <div class="board">
-      <span>分数：</span>
-      <span class="score">
-        {{ score }}
-      </span>
-    </div>
-  </div>
-  <div class="main">
-    <div
-      id="game-wrapper"
-      style="width: 100%; height: 100%"
-    />
-  </div>
-  <div style="text-align: center; margin: 20px 0">
-    <a-button v-if="isFirstStart" type="primary" @click="startGame">
-      开始游戏
-    </a-button>
-    <a-button v-else type="primary" @click="restartGame">
-      重新开始
-    </a-button>
-  </div>
+  <GameContainer
+    :title="gameTitle"
+    :instructions="gameInstructions"
+    :score="score"
+    :is-first-start="isFirstStart"
+    @start="startGame"
+    @restart="restartGame"
+  />
 </template>
 
 <style scoped>
-.main {
-  display: flex;
-  text-align: center;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 500px;
-}
-
-.score-board {
-  display: flex;
-  justify-content: center;
-}
-
-.score-board > .board {
-  height: 60px;
-  width: 120px;
-  text-align: center;
-  line-height: 60px;
-  background: #03d5fa;
-  color: yellow;
-  margin-top: 20px;
-  border-radius: 8px;
-  box-shadow: 4px 4px 6px 0 rgba(0, 0, 0, .2);
-}
-
-.score-board > .board > .score {
-  font-size: 24px;
-  font-weight: 600;
-}
+/* 游戏特定样式可以在这里添加 */
 </style>
