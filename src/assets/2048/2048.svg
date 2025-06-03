@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="200" height="200">
+  <rect x="56" y="56" width="400" height="400" rx="8" fill="#BBADA0" />
+  <rect x="72" y="72" width="84" height="84" rx="4" fill="#EEE4DA" />
+  <rect x="168" y="72" width="84" height="84" rx="4" fill="#EDE0C8" />
+  <rect x="264" y="72" width="84" height="84" rx="4" fill="#F2B179" />
+  <rect x="360" y="72" width="84" height="84" rx="4" fill="#F59563" />
+  <rect x="72" y="168" width="84" height="84" rx="4" fill="#F67C5F" />
+  <rect x="168" y="168" width="84" height="84" rx="4" fill="#F65E3B" />
+  <rect x="264" y="168" width="84" height="84" rx="4" fill="#EDCF72" />
+  <rect x="360" y="168" width="84" height="84" rx="4" fill="#EDCC61" />
+  <rect x="72" y="264" width="84" height="84" rx="4" fill="#EDC850" />
+  <rect x="168" y="264" width="84" height="84" rx="4" fill="#EDC53F" />
+  <rect x="264" y="264" width="84" height="84" rx="4" fill="#EDC22E" />
+  <rect x="360" y="264" width="84" height="84" rx="4" fill="#3C3A32" />
+  <rect x="72" y="360" width="84" height="84" rx="4" fill="#EEE4DA" />
+  <rect x="168" y="360" width="84" height="84" rx="4" fill="#EEE4DA" />
+  <rect x="264" y="360" width="84" height="84" rx="4" fill="#EEE4DA" />
+  <rect x="360" y="360" width="84" height="84" rx="4" fill="#EEE4DA" />
+
+  <text x="114" y="124" font-family="Arial" font-size="32" font-weight="bold" fill="#776E65"
+    text-anchor="middle">2</text>
+  <text x="210" y="124" font-family="Arial" font-size="32" font-weight="bold" fill="#776E65"
+    text-anchor="middle">4</text>
+  <text x="306" y="124" font-family="Arial" font-size="32" font-weight="bold" fill="#F9F6F2"
+    text-anchor="middle">8</text>
+  <text x="402" y="124" font-family="Arial" font-size="32" font-weight="bold" fill="#F9F6F2"
+    text-anchor="middle">16</text>
+  <text x="114" y="220" font-family="Arial" font-size="32" font-weight="bold" fill="#F9F6F2"
+    text-anchor="middle">32</text>
+  <text x="210" y="220" font-family="Arial" font-size="32" font-weight="bold" fill="#F9F6F2"
+    text-anchor="middle">64</text>
+  <text x="306" y="220" font-family="Arial" font-size="32" font-weight="bold" fill="#776E65"
+    text-anchor="middle">128</text>
+  <text x="402" y="220" font-family="Arial" font-size="32" font-weight="bold" fill="#776E65"
+    text-anchor="middle">256</text>
+  <text x="114" y="316" font-family="Arial" font-size="32" font-weight="bold" fill="#776E65"
+    text-anchor="middle">512</text>
+  <text x="210" y="316" font-family="Arial" font-size="28" font-weight="bold" fill="#776E65"
+    text-anchor="middle">1024</text>
+  <text x="306" y="316" font-family="Arial" font-size="28" font-weight="bold" fill="#776E65"
+    text-anchor="middle">2048</text>
+  <text x="402" y="316" font-family="Arial" font-size="28" font-weight="bold" fill="#F9F6F2"
+    text-anchor="middle">4096</text>
+</svg>
