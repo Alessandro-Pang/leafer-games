@@ -1,3 +1,11 @@
+/*
+ * @Author: zi.yang
+ * @Date: 2024-07-14 21:46:47
+ * @LastEditors: zi.yang
+ * @LastEditTime: 2025-06-04 01:36:01
+ * @Description:
+ * @FilePath: /leafer-games/src/utils/index.ts
+ */
 /**
  * 随机整数
  * @param min

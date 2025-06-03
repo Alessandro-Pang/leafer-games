@@ -2,7 +2,7 @@
  * @Author: zi.yang
  * @Date: 2024-07-06 14:16:02
  * @LastEditors: zi.yang
- * @LastEditTime: 2025-06-04 00:16:37
+ * @LastEditTime: 2025-06-04 01:45:35
  * @Description: 首页
  * @FilePath: /leafer-games/src/views/home/index.vue
 -->
@@ -10,6 +10,10 @@
 import { computed, onMounted, ref } from 'vue';
 
 import { routes } from '@/router'; // eslint-disable-line
+
+function getImageUrl(name: string): string {
+  return new URL(`../../assets/${name}`, import.meta.url).href;
+}
 
 // 过滤出要显示的路由
 const routesList = routes.filter((item: any) => !item.meta.hidden);
@@ -55,7 +59,9 @@ const resetActiveCard = () => {
     <h1 class="page-title">
       选择你喜欢的游戏
     </h1>
-    <p class="page-subtitle">探索多种有趣的小游戏，放松身心，享受乐趣</p>
+    <p class="page-subtitle">
+      探索多种有趣的小游戏，放松身心，享受乐趣
+    </p>
 
     <div class="search-box">
       <input
@@ -100,7 +106,9 @@ const resetActiveCard = () => {
         <line x1="15" y1="9" x2="15.01" y2="9"></line>
       </svg>
       <p>没有找到匹配的游戏</p>
-      <button class="reset-search" @click="searchQuery = ''">重置搜索</button>
+      <button class="reset-search" @click="searchQuery = ''">
+        重置搜索
+      </button>
     </div>
 
     <ul class="card-list" :class="{ 'is-loaded': isLoaded }">
@@ -117,13 +125,18 @@ const resetActiveCard = () => {
           <router-link :to="route.path">
             <div class="card-content">
               <div class="card-icon">
-                <img :src="route.meta.icon" :alt="route.meta.title" />
+                <img
+                  :src="getImageUrl(route.meta.icon)"
+                  :alt="route.meta.title"
+                />
               </div>
               <div class="card-info">
                 <span class="link-name">
                   {{ route.meta.title }}
                 </span>
-                <p class="card-description">{{ route.meta.description }}</p>
+                <p class="card-description">
+                  {{ route.meta.description }}
+                </p>
                 <div class="play-button">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
